@@ -27,7 +27,7 @@ export async function fetcher<T>(method: FetcherMethod, path: string, data?: any
     let response
     if (method === FetcherMethod.GET || method === FetcherMethod.DELETE) {
         response = await fetch(buildUrl(path, data), {
-            method: "GET",
+            method: method,
         })
     } else {
         response = await fetch(path, {

@@ -26,8 +26,8 @@ import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Button } from "./ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,10 +37,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { IconButton } from "./xui/icon-button"
-import { NzNavigationMenuLink } from "./xui/navigation-menu"
+} from "@/components/ui/dropdown-menu"
+import { IconButton } from "@/components/xui/icon-button"
+import { NzNavigationMenuLink } from "@/components/xui/navigation-menu"
 
+// =======================================================
+// vvvvvvvvvvv 1. 在这里为移动端菜单添加新页面 vvvvvvvvvvv
 const pages = [
     { href: "/dashboard", label: i18next.t("Server") },
     { href: "/dashboard/service", label: i18next.t("Service") },
@@ -48,8 +50,11 @@ const pages = [
     { href: "/dashboard/notification", label: i18next.t("Notification") },
     { href: "/dashboard/ddns", label: i18next.t("DDNS") },
     { href: "/dashboard/nat", label: i18next.t("NATT") },
+    { href: "/dashboard/domain", label: i18next.t("Domain") }, // <-- 新增的域名监控链接
     { href: "/dashboard/server-group", label: i18next.t("Group") },
 ]
+// ^^^^^^^^^^^ 1. 在这里为移动端菜单添加新页面 ^^^^^^^^^^^
+// =======================================================
 
 export default function Header() {
     const { t } = useTranslation()
@@ -233,6 +238,21 @@ export default function Header() {
                                     <Link to="/dashboard/nat">{t("NATT")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
+
+                            {/* ======================================================= */}
+                            {/* vvvvvvvvvvv 2. 在这里为桌面端菜单添加新链接 vvvvvvvvvvv */}
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/domain"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/domain">{t("Domain")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
+                            {/* ^^^^^^^^^^^ 2. 在这里为桌面端菜单添加新链接 ^^^^^^^^^^^ */}
+                            {/* ======================================================= */}
+                            
                             <NavigationMenuItem>
                                 <NzNavigationMenuLink
                                     asChild
@@ -408,3 +428,4 @@ function Overview() {
         </section>
     )
 }
+

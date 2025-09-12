@@ -25,7 +25,7 @@ import ServicePage from "./routes/service"
 import SettingsPage from "./routes/settings"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
-
+import DomainPage from "./routes/domain"
 const router = createBrowserRouter([
     {
         path: "/dashboard",
@@ -137,6 +137,10 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/settings/online-user",
                 element: <OnlineUserPage />,
+            },
+            {
+                path: "/dashboard/domain",
+                element: <DomainPage />,
             },
         ],
     },
