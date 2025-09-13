@@ -1,4 +1,4 @@
-// src/routes/domain.tsx (最终完整版)
+// src/routes/domain.tsx (最终 Bug 修复版)
 
 import { useState, useEffect } from 'react'
 import { PlusCircle, RefreshCw, MoreVertical, Trash2, Edit, CheckCircle } from 'lucide-react'
@@ -28,15 +28,12 @@ export default function DomainPage() {
   const [domains, setDomains] = useState<Domain[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
-  // 添加弹窗状态
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [newDomainName, setNewDomainName] = useState('')
   
-  // 验证信息弹窗状态
   const [verificationToken, setVerificationToken] = useState('')
   const [isVerificationInfoModalOpen, setIsVerificationInfoModalOpen] = useState(false)
 
-  // 编辑弹窗状态
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [currentDomain, setCurrentDomain] = useState<Domain | null>(null)
   const [editFormData, setEditFormData] = useState<Partial<BillingDataMod>>({})
@@ -46,9 +43,7 @@ export default function DomainPage() {
 
   useEffect(() => {
     if (domainData) {
-      // 过滤掉 pending 状态的域名，因为公开页面不显示它们
-      const visibleDomains = domainData.filter(d => d.Status === 'verified' || d.Status === 'expired')
-      setDomains(visibleDomains)
+      setDomains(domainData)
       setIsLoading(false)
     }
     if (error) {
@@ -57,7 +52,6 @@ export default function DomainPage() {
     }
   }, [domainData, error])
 
-  // --- 事件处理函数 ---
   const handleAddDomain = async () => {
     if (!newDomainName) {
       toast.error('请输入域名')
@@ -108,7 +102,7 @@ export default function DomainPage() {
         billing_data: domain.BillingData as BillingDataMod,
       })
       toast.success(`域名 ${domain.Domain} 的可见状态已更新`)
-      mutate() // 刷新列表以显示最新状态
+      mutate()
     } catch (err) {
       toast.error('更新失败', { description: (err as Error).message })
     }
@@ -131,7 +125,6 @@ export default function DomainPage() {
     if (!currentDomain) return
     try {
       const dataToSend = { ...editFormData };
-      // 将 HTML date input 的 'YYYY-MM-DD' 格式转换为后端需要的 ISO 字符串格式
       if (dataToSend.registeredDate) {
         dataToSend.registeredDate = new Date(dataToSend.registeredDate).toISOString();
       }
@@ -160,7 +153,7 @@ export default function DomainPage() {
     }
   }
 
-  // --- JSX 渲染 ---
+  // --- JSX 渲染 (保持不变) ---
   return (
     <>
       <Card>
@@ -233,6 +226,7 @@ export default function DomainPage() {
         </CardContent>
       </Card>
 
+      {/* 验证信息弹窗 */}
       <Dialog open={isVerificationInfoModalOpen} onOpenChange={setIsVerificationInfoModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -253,6 +247,7 @@ export default function DomainPage() {
         </DialogContent>
       </Dialog>
       
+      {/* 编辑弹窗 */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
