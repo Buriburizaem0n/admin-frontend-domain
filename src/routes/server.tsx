@@ -174,7 +174,7 @@ export default function ServerPage() {
                     className="flex-2 flex ml-auto gap-2"
                     delete={{
                         fn: deleteServer,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id).filter(Boolean) as number[],
                         mutate: mutate,
                     }}
                 >
