@@ -37,3 +37,8 @@ export const deleteDomain = (id: number) => {
 export const updateDomain = (id: number, data: { is_public: boolean, billing_data: BillingDataMod }) => {
     return fetcher<Domain>(FetcherMethod.PUT, `/api/v1/domains/${id}`, data)
 }
+
+// 同步 Whois 信息
+export const syncDomainWHOIS = (id: number) => {
+  return fetcher<Domain>(FetcherMethod.POST, `/api/v1/domains/${id}/sync`)
+}

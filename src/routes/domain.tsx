@@ -1,7 +1,7 @@
 // src/routes/domain.tsx (最终 Bug 修复版)
 
 import { useState, useEffect } from 'react'
-import { PlusCircle, RefreshCw, MoreVertical, Trash2, Edit, CheckCircle } from 'lucide-react'
+import { PlusCircle, RefreshCw, MoreVertical, Trash2, Edit, CheckCircle, RefreshCcw } from 'lucide-react'
 
 // 导入 shadcn/ui 组件
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +19,7 @@ import { toast } from 'sonner'
 
 // 导入 API 类型和函数
 import type { Domain, BillingDataMod } from '@/types/api'
-import { useDomainList, addDomain, verifyDomain, deleteDomain, updateDomain } from '@/api/domain'
+import { useDomainList, addDomain, verifyDomain, deleteDomain, updateDomain, syncDomainWHOIS } from '@/api/domain'
 import useSWR from 'swr'
 
 
@@ -80,6 +80,17 @@ export default function DomainPage() {
       setTimeout(() => mutate(), 2000)
     } catch (err) {
       toast.error('操作失败', { description: (err as Error).message })
+    }
+  }
+
+  const handleSyncWhois = async (domainId: number) => {
+    const loadingToast = toast.loading('正在同步 Whois 信息...')
+    try {
+      await syncDomainWHOIS(domainId)
+      toast.success('同步成功', { id: loadingToast, description: '域名 Whois 信息已更新。' })
+      mutate()
+    } catch (err) {
+      toast.error('同步失败', { id: loadingToast, description: (err as Error).message })
     }
   }
 
@@ -213,6 +224,7 @@ export default function DomainPage() {
                         <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent>
                           {domain.Status === 'pending' && (<DropdownMenuItem onClick={() => handleVerify(domain.ID)}><CheckCircle className="mr-2 h-4 w-4" /> 验证</DropdownMenuItem>)}
+                          {domain.Status === 'verified' && (<DropdownMenuItem onClick={() => handleSyncWhois(domain.ID)}><RefreshCcw className="mr-2 h-4 w-4" /> 同步 Whois</DropdownMenuItem>)}
                           <DropdownMenuItem onClick={() => handleEditClick(domain)}><Edit className="mr-2 h-4 w-4" /> 编辑</DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(domain.ID, domain.Domain)}><Trash2 className="mr-2 h-4 w-4" /> 删除</DropdownMenuItem>
                         </DropdownMenuContent>
