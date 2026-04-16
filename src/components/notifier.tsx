@@ -50,7 +50,7 @@ interface NotifierCardProps {
 
 const notificationFormSchema = z.object({
     name: z.string().min(1),
-    url: z.string().url(),
+    url: z.string().min(1),
     request_method: z.coerce.number().int().min(1).max(255),
     request_type: z.coerce.number().int().min(1).max(255),
     request_header: z.string(),
