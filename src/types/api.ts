@@ -667,8 +667,12 @@ export interface ModelSetting {
   /** 用于前端判断生成的安装命令是否启用 TLS */
   tls?: boolean;
   user_template?: string;
-  /** 前端真实IP */
   web_real_ip_header?: string;
+  custom_logo?: string;
+  custom_description?: string;
+  custom_links?: string;
+  background_image_day?: string;
+  background_image_night?: string;
 }
 
 export interface ModelSettingForm {
@@ -690,8 +694,17 @@ export interface ModelSettingForm {
   site_name?: string;
   tls?: boolean;
   user_template?: string;
-  /** 前端真实IP */
   web_real_ip_header?: string;
+  /** 自定义Logo链接 */
+  custom_logo?: string;
+  /** 自定义描述/副标题 */
+  custom_description?: string;
+  /** 自定义导航链接 (JSON) */
+  custom_links?: string;
+  /** 白天背景图链接 */
+  background_image_day?: string;
+  /** 夜间背景图链接 */
+  background_image_night?: string;
 }
 
 export interface ModelSettingResponse {

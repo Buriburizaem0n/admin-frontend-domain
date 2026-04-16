@@ -52,6 +52,11 @@ const settingFormSchema = z.object({
     tls: asOptionalField(z.boolean()),
     enable_ip_change_notification: asOptionalField(z.boolean()),
     enable_plain_ip_in_notification: asOptionalField(z.boolean()),
+    custom_logo: asOptionalField(z.string()),
+    custom_description: asOptionalField(z.string()),
+    custom_links: asOptionalField(z.string()),
+    background_image_day: asOptionalField(z.string()),
+    background_image_night: asOptionalField(z.string()),
 })
 
 export default function SettingsPage() {
@@ -134,6 +139,71 @@ export default function SettingsPage() {
                                     <FormLabel>{t("SiteName")}</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="custom_logo"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Custom Logo URL</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="https://example.com/logo.png" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="custom_description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Custom Description / Subtitle</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="My monitoring dashboard" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="custom_links"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Custom Links (JSON Array)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='[{"link":"https://loohui.com/","name":"Blog","blank":false}]' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="background_image_day"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Background Image (Day)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="https://example.com/day.jpg" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="background_image_night"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Background Image (Night)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="https://example.com/night.jpg" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
