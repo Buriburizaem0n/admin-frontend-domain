@@ -54,6 +54,7 @@ interface ServiceCardProps {
 
 const serviceFormSchema = z.object({
     cover: z.coerce.number().int().min(0),
+    display_index: z.coerce.number().int(),
     duration: z.coerce.number().int().min(30),
     enable_show_in_service: asOptionalField(z.boolean()),
     enable_trigger_task: asOptionalField(z.boolean()),
@@ -67,7 +68,7 @@ const serviceFormSchema = z.object({
     notify: asOptionalField(z.boolean()),
     recover_trigger_tasks: z.array(z.number()),
     recover_trigger_tasks_raw: z.string(),
-    skip_servers: z.record(z.boolean()),
+    skip_servers: z.record(z.string(), z.boolean()),
     skip_servers_raw: z.array(z.string()),
     target: z.string(),
     type: z.coerce.number().int().min(0),
@@ -75,8 +76,8 @@ const serviceFormSchema = z.object({
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<z.infer<typeof serviceFormSchema>>({
-        resolver: zodResolver(serviceFormSchema),
+    const form = useForm({
+        resolver: zodResolver(serviceFormSchema) as any,
         defaultValues: data
             ? {
                   ...data,
@@ -87,6 +88,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
             : {
                   type: 1,
                   cover: 0,
+                  display_index: 0,
                   name: "",
                   target: "",
                   max_latency: 0.0,
@@ -107,7 +109,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: z.infer<typeof serviceFormSchema>) => {
+    const onSubmit = async (values: any) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
@@ -167,6 +169,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                     placeholder="My Service Monitor"
                                                     {...field}
                                                 />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="display_index"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("Weight")}</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="0" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

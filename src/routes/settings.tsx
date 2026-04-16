@@ -21,6 +21,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Combobox } from "@/components/ui/combobox"
+import { useNotification } from "@/hooks/useNotfication"
 import { useAuth } from "@/hooks/useAuth"
 import useSetting from "@/hooks/useSetting"
 import { asOptionalField } from "@/lib/utils"
@@ -58,14 +60,20 @@ export default function SettingsPage() {
     const { profile } = useAuth()
     const navigate = useNavigate()
 
+    const { notifierGroup } = useNotification()
+    const ngroupList = notifierGroup?.map((ng) => ({
+        value: `${ng.group.id}`,
+        label: ng.group.name,
+    })) || [{ value: "", label: "" }]
+
     const isAdmin = profile?.role === 0
 
     if (!isAdmin) {
         navigate("/dashboard/settings/online-user")
     }
 
-    const form = useForm<z.infer<typeof settingFormSchema>>({
-        resolver: zodResolver(settingFormSchema),
+    const form = useForm({
+        resolver: zodResolver(settingFormSchema) as any,
         defaultValues: config
             ? {
                   ...config.config,
@@ -92,7 +100,7 @@ export default function SettingsPage() {
         }
     }, [config?.config, form])
 
-    const onSubmit = async (values: z.infer<typeof settingFormSchema>) => {
+    const onSubmit = async (values: any) => {
         try {
             await updateSettings(values)
             form.reset()
@@ -448,12 +456,13 @@ export default function SettingsPage() {
                                             name="ip_change_notification_group_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>{t("NotifierGroupID")}</FormLabel>
+                                                    <FormLabel>{t("NotifierGroup")}</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="0"
-                                                            type="number"
-                                                            {...field}
+                                                        <Combobox
+                                                            placeholder={t("Search")}
+                                                            options={ngroupList}
+                                                            onValueChange={field.onChange}
+                                                            defaultValue={field.value?.toString()}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
