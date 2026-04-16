@@ -9,7 +9,6 @@ import { NoteMenu } from "@/components/note-menu"
 import { ServerCard } from "@/components/server"
 import { ServerConfigCard } from "@/components/server-config"
 import { ServerConfigCardBatch } from "@/components/server-config-batch"
-import { TerminalButton } from "@/components/terminal"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     DropdownMenu,
