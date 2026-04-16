@@ -11,12 +11,6 @@ import { ServerConfigCard } from "@/components/server-config"
 import { ServerConfigCardBatch } from "@/components/server-config-batch"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
     Table,
     TableBody,
     TableCell,
@@ -36,10 +30,7 @@ import useSWR from "swr"
 
 export default function ServerPage() {
     const { t } = useTranslation()
-    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher, {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-    })
+    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher)
     const { serverGroups } = useServer()
 
     useEffect(() => {
@@ -93,7 +84,7 @@ export default function ServerPage() {
             accessorFn: (row) => {
                 return (
                     serverGroups
-                        ?.filter((sg) => sg.servers?.includes(row.id))
+                        ?.filter((sg) => sg.servers?.includes(row.id!))
                         .map((sg) => sg.group.id) || []
                 )
             },
@@ -113,7 +104,7 @@ export default function ServerPage() {
         {
             header: t("Version"),
             accessorKey: "host.version",
-            accessorFn: (row) => row.host.version || t("Unknown"),
+            accessorFn: (row) => row.host?.version || t("Unknown"),
         },
         {
             header: t("EnableDDNS"),
@@ -149,30 +140,11 @@ export default function ServerPage() {
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
-                        delete={{ fn: deleteServer, id: s.id, mutate: mutate }}
+                        delete={{ fn: deleteServer, id: s.id!, mutate: mutate }}
                     >
                         <>
                             <ServerCard mutate={mutate} data={s} />
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <IconButton
-                                        icon="more"
-                                        variant="outline"
-                                        aria-label="More actions"
-                                    />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem asChild>
-                                        <TerminalButton id={s.id} menuItem />
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <ServerConfigCard sid={s.id} variant="ghost" menuItem />
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <InstallCommandsMenu uuid={s.uuid} menuItem />
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <ServerConfigCard sid={s.id!} variant="outline" />
                         </>
                     </ActionButtonGroup>
                 )
@@ -193,11 +165,11 @@ export default function ServerPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     return (
-        <div className="px-3 max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 mt-6 mb-4">
+        <div className="px-3">
+            <div className="flex mt-6 mb-4">
                 <h1 className="text-3xl font-bold tracking-tight">{t("Server")}</h1>
                 <HeaderButtonGroup
-                    className="flex gap-2 flex-wrap shrink-0"
+                    className="flex-2 flex ml-auto gap-2"
                     delete={{
                         fn: deleteServer,
                         id: selectedRows.map((r) => r.original.id).filter(Boolean) as number[],
@@ -207,7 +179,7 @@ export default function ServerPage() {
                     <IconButton
                         icon="update"
                         onClick={async () => {
-                            const id = selectedRows.map((r) => r.original.id)
+                            const id = selectedRows.map((r) => r.original.id) as number[]
                             if (id.length < 1) {
                                 toast(t("Error"), {
                                     description: t("Results.SelectAtLeastOneServer"),
@@ -240,67 +212,59 @@ export default function ServerPage() {
                             })
                         }}
                     />
-                    <BatchMoveServerIcon serverIds={selectedRows.map((r) => r.original.id)} />
+                    <BatchMoveServerIcon serverIds={selectedRows.map((r) => r.original.id) as number[]} />
                     <ServerConfigCardBatch
-                        sid={selectedRows.map((r) => r.original.id)}
+                        sid={selectedRows.map((r) => r.original.id) as number[]}
                         className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"
                     />
                     <InstallCommandsMenu className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-blue-700 text-white hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg" />
                 </HeaderButtonGroup>
             </div>
-            <div className="rounded-md border overflow-x-auto">
-                <Table className="min-w-[960px]">
-                    <TableHeader className="sticky top-0 bg-background z-10">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id} className="text-sm">
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    )
-                                })}
+            <Table>
+                <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => {
+                                return (
+                                    <TableHead key={header.id} className="text-sm">
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext(),
+                                              )}
+                                    </TableHead>
+                                )
+                            })}
+                        </TableRow>
+                    ))}
+                </TableHeader>
+                <TableBody>
+                    {isLoading ? (
+                        <TableRow>
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("Loading")}...
+                            </TableCell>
+                        </TableRow>
+                    ) : table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                {row.getVisibleCells().map((cell) => (
+                                    <TableCell key={cell.id} className="text-xsm">
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                ))}
                             </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t("Loading")}...
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="text-xsm">
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t("NoResults")}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t("NoResults")}
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
         </div>
     )
 }

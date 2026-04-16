@@ -1,31 +1,27 @@
-// NOTE: Do not modify the import order unless absolutely necessary.
 import { createRoot } from "react-dom/client"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 
-import "./index.css"
-import "./lib/i18n"
 
+import ErrorPage from "./error-page"
 import { AuthProvider } from "./hooks/useAuth"
 import { NotificationProvider } from "./hooks/useNotfication"
 import { ServerProvider } from "./hooks/useServer"
-
-import Root from "./routes/root"
-import ErrorPage from "./error-page"
-
-import ProtectedRoute from "./routes/protect"
-import CronPage from "./routes/cron"
-import LoginPage from "./routes/login"
-import ServerPage from "./routes/server"
-import ServicePage from "./routes/service"
-import { TerminalPage } from "./components/terminal"
-import DDNSPage from "./routes/ddns"
-import NATPage from "./routes/nat"
-import NotificationGroupPage from "./routes/notification-group"
-import ServerGroupPage from "./routes/server-group"
+import "./index.css"
+import "./lib/i18n"
 import AlertRulePage from "./routes/alert-rule"
+import CronPage from "./routes/cron"
+import DDNSPage from "./routes/ddns"
+import LoginPage from "./routes/login"
+import NATPage from "./routes/nat"
 import NotificationPage from "./routes/notification"
+import NotificationGroupPage from "./routes/notification-group"
 import OnlineUserPage from "./routes/online-user"
 import ProfilePage from "./routes/profile"
+import ProtectedRoute from "./routes/protect"
+import Root from "./routes/root"
+import ServerPage from "./routes/server"
+import ServerGroupPage from "./routes/server-group"
+import ServicePage from "./routes/service"
 import SettingsPage from "./routes/settings"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
@@ -75,6 +71,14 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: "/dashboard/notification",
+                element: (
+                    <NotificationProvider withNotifierGroup>
+                        <NotificationPage />
+                    </NotificationProvider>
+                ),
+            },
+            {
                 path: "/dashboard/alert-rule",
                 element: (
                     <NotificationProvider withNotifierGroup>
@@ -106,18 +110,7 @@ const router = createBrowserRouter([
                     </NotificationProvider>
                 ),
             },
-            {
-                path: "/dashboard/terminal/:id",
-                element: <TerminalPage />,
-            },
-            {
-                path: "/dashboard/notification",
-                element: (
-                    <NotificationProvider withNotifierGroup>
-                        <NotificationPage />
-                    </NotificationProvider>
-                ),
-            },
+
             {
                 path: "/dashboard/profile",
                 element: (
@@ -128,11 +121,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/settings",
-                element: (
-                    <NotificationProvider withNotifierGroup>
-                        <SettingsPage />
-                    </NotificationProvider>
-                ),
+                element: <SettingsPage />,
             },
             {
                 path: "/dashboard/settings/user",
