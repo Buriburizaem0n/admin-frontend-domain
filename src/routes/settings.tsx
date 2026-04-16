@@ -133,6 +133,32 @@ export default function SettingsPage() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                         <FormField
                             control={form.control}
+                            name="ip_change_notification_group_id"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("IPChangeNotificationGroupID")}</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="expiry_notification_group_id"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Expiry Notification Group ID</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="Enter Group ID" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="site_name"
                             render={({ field }) => (
                                 <FormItem>

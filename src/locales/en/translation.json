@@ -151,6 +151,8 @@
     "AgentRealIPHeader": "Agent real IP request header",
     "UseDirectConnectingIP": "Use direct connection IP",
     "IPChangeNotification": "IP Change Notification",
+    "IPChangeNotificationGroupID": "IP Change Notification Group ID",
+    "ExpiryNotificationGroupID": "Expiry Notification Group ID",
     "FullIPNotification": "Show Full IP Address in Notification Messages",
     "EditService": "Edit Service",
     "CreateService": "Create Service",

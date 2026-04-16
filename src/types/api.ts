@@ -389,6 +389,7 @@ export interface ModelNotification {
   created_at?: string;
   id?: number;
   name: string;
+  type?: number;
   request_body: string;
   request_header: string;
   request_method: number;
@@ -401,6 +402,7 @@ export interface ModelNotification {
 export interface ModelNotificationForm {
   /** @minLength 1 */
   name?: string;
+  type?: number;
   request_body?: string;
   request_header?: string;
   request_method?: number;
@@ -464,6 +466,17 @@ export interface ModelProfileForm {
   reject_password?: boolean;
 }
 
+export interface ModelBillingDataMod {
+  registrar?: string;
+  registeredDate?: string;
+  endDate?: string;
+  renewalPrice?: string;
+  autoRenewal?: string;
+  notes?: string;
+  cycle?: string;
+  amount?: string;
+}
+
 export interface ModelRule {
   /** 覆盖范围 RuleCoverAll/IgnoreAll */
   cover: number;
@@ -519,6 +532,7 @@ export interface ModelServer {
   /** 公开备注 */
   public_note?: string;
   state?: ModelHostState;
+  billing_data?: ModelBillingDataMod;
   updated_at?: string;
   uuid?: string;
 }
@@ -546,6 +560,7 @@ export interface ModelServerForm {
   override_ddns_domains?: Record<string, string[]>;
   /** 公开备注 */
   public_note?: string;
+  billing_data?: ModelBillingDataMod;
 }
 
 export interface ModelServerGroup {
@@ -655,6 +670,7 @@ export interface ModelSetting {
   enable_ip_change_notification?: boolean;
   /** 通知信息IP不打码 */
   enable_plain_ip_in_notification?: boolean;
+  expiry_notification_group_id?: number;
   /** 特定服务器IP（多个服务器用逗号分隔） */
   ignored_ip_notification?: string;
   ignored_ip_notification_server_ids?: Record<string, boolean>;
@@ -684,6 +700,7 @@ export interface ModelSettingForm {
   dns_servers?: string;
   enable_ip_change_notification?: boolean;
   enable_plain_ip_in_notification?: boolean;
+  expiry_notification_group_id?: number;
   ignored_ip_notification?: string;
   install_host?: string;
   /** IP变更提醒的通知组 */

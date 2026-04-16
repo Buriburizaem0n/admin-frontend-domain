@@ -58,6 +58,7 @@ const notificationFormSchema = z.object({
     verify_tls: asOptionalField(z.boolean()),
     skip_check: asOptionalField(z.boolean()),
     format_metric_units: asOptionalField(z.boolean()),
+    type: z.coerce.number().int().default(1),
 })
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
@@ -77,6 +78,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   verify_tls: (data as any).verify_tls ?? false,
                   skip_check: (data as any).skip_check ?? false,
                   format_metric_units: (data as any).format_metric_units ?? false,
+                  type: data.type ?? 1,
               }
             : {
                   name: "",
@@ -88,6 +90,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   verify_tls: false,
                   skip_check: false,
                   format_metric_units: false,
+                  type: 1,
               },
         resetOptions: {
             keepDefaultValues: false,
@@ -145,10 +148,34 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
+                                    name="type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Notification Type</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={`${field.value}`}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="1">Webhook</SelectItem>
+                                                    <SelectItem value="2">SMTP (Email)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
                                     name="url"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>URL</FormLabel>
+                                            <FormLabel>{form.watch("type") == 2 ? "SMTP Server (host:port)" : "URL"}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} />
                                             </FormControl>
@@ -156,72 +183,76 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="request_method"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("RequestMethod")}</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={`${field.value}`}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Request Method" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.entries(nrequestMethods).map(
-                                                        ([k, v]) => (
-                                                            <SelectItem key={k} value={k}>
-                                                                {v}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="request_type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("Type")}</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={`${field.value}`}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Request Type" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.entries(nrequestTypes).map(([k, v]) => (
-                                                        <SelectItem key={k} value={k}>
-                                                            {v}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {form.watch("type") != 2 && (
+                                    <>
+                                        <FormField
+                                            control={form.control}
+                                            name="request_method"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("RequestMethod")}</FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={`${field.value}`}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Request Method" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {Object.entries(nrequestMethods).map(
+                                                                ([k, v]) => (
+                                                                    <SelectItem key={k} value={k}>
+                                                                        {v}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="request_type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("Type")}</FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={`${field.value}`}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Request Type" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {Object.entries(nrequestTypes).map(([k, v]) => (
+                                                                <SelectItem key={k} value={k}>
+                                                                    {v}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </>
+                                )}
                                 <FormField
                                     control={form.control}
                                     name="request_header"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("RequestHeader")}</FormLabel>
+                                            <FormLabel>{form.watch("type") == 2 ? "SMTP User:Pass" : t("RequestHeader")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
-                                                    placeholder='{"User-Agent":"Nezha-Agent"}'
+                                                    placeholder={form.watch("type") == 2 ? "user:pass" : '{"User-Agent":"Nezha-Agent"}'}
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -234,11 +265,11 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     name="request_body"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("RequestBody")}</FormLabel>
+                                            <FormLabel>{form.watch("type") == 2 ? "Recipient Email" : t("RequestBody")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    className="resize-y h-[240px]"
-                                                    placeholder='{&#13;&#10;  "content":"#NEZHA#",&#13;&#10;  "ServerName":"#SERVER.NAME#",&#13;&#10;  "ServerIP":"#SERVER.IP#",&#13;&#10;  "ServerIPV4":"#SERVER.IPV4#",&#13;&#10;  "ServerIPV6":"#SERVER.IPV6#",&#13;&#10;  "CPU":"#SERVER.CPU#",&#13;&#10;  "MEM":"#SERVER.MEM#",&#13;&#10;  "SWAP":"#SERVER.SWAP#",&#13;&#10;  "DISK":"#SERVER.DISK#",&#13;&#10;  "NetInSpeed":"#SERVER.NETINSPEED#",&#13;&#10;  "NetOutSpeed":"#SERVER.NETOUTSPEED#",&#13;&#10;  "TransferIn":"#SERVER.TRANSFERIN#",&#13;&#10;  "TranferOut":"#SERVER.TRANSFEROUT#",&#13;&#10;  "Load1":"#SERVER.LOAD1#",&#13;&#10;  "Load5":"#SERVER.LOAD5#",&#13;&#10;  "Load15":"#SERVER.LOAD15#",&#13;&#10;  "TCP_CONN_COUNT":"#SERVER.TCPCONNCOUNT",&#13;&#10;  "UDP_CONN_COUNT":"#SERVER.UDPCONNCOUNT"&#13;&#10;}'
+                                                    className={form.watch("type") == 2 ? "resize-y" : "resize-y h-[240px]"}
+                                                    placeholder={form.watch("type") == 2 ? "target@example.com" : '...'}
                                                     {...field}
                                                 />
                                             </FormControl>

@@ -65,6 +65,11 @@ const serverFormSchema = z.object({
             },
         ),
     ),
+    billing_data: z.object({
+        registrar: asOptionalField(z.string()),
+        endDate: asOptionalField(z.string()),
+        notes: asOptionalField(z.string()),
+    }).optional(),
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
@@ -249,6 +254,35 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+                                <div className="p-3 border rounded-md border-dashed space-y-2">
+                                    <Label className="text-xs text-muted-foreground uppercase font-bold">Billing & Expiry</Label>
+                                    <FormField
+                                        control={form.control as any}
+                                        name="billing_data.registrar"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Registrar</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="AWS / Azure /阿里云" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control as any}
+                                        name="billing_data.endDate"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Expiry Date</FormLabel>
+                                                <FormControl>
+                                                    <Input type="date" {...field} value={field.value?.split('T')[0] || ''} onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : '')} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <FormField
                                     control={form.control as any}
                                     name="public_note"
