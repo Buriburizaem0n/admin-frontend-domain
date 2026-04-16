@@ -70,7 +70,7 @@ const serverFormSchema = z.object({
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
     const form = useForm<z.infer<typeof serverFormSchema>>({
-        resolver: zodResolver(serverFormSchema),
+        resolver: zodResolver(serverFormSchema) as any,
         defaultValues: {
             ...data,
             ddns_profiles_raw: data.ddns_profiles ? conv.arrToStr(data.ddns_profiles) : undefined,
@@ -98,7 +98,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
         return () => window.removeEventListener('message', handleMessage);
     }, [form, t]);
 
-    const onSubmit = async (values: z.infer<typeof serverFormSchema>) => {
+    const onSubmit = async (values: any) => {
         try {
             values.ddns_profiles = values.ddns_profiles_raw
                 ? conv.strToArr(values.ddns_profiles_raw).map(Number)
@@ -131,10 +131,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                             <DialogTitle>{t("EditServer")}</DialogTitle>
                             <DialogDescription />
                         </DialogHeader>
-                        <Form {...form}>
+                        <Form {...(form as any)}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
@@ -147,7 +147,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="display_index"
                                     render={({ field }) => (
                                         <FormItem>
@@ -162,7 +162,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                 {form.watch("enable_ddns") ? (
                                     <>
                                         <FormField
-                                            control={form.control}
+                                            control={form.control as any}
                                             name="ddns_profiles_raw"
                                             render={({ field }) => (
                                                 <FormItem>
@@ -177,7 +177,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             )}
                                         />
                                         <FormField
-                                            control={form.control}
+                                            control={form.control as any}
                                             name="override_ddns_domains_raw"
                                             render={({ field }) => (
                                                 <FormItem>
@@ -197,7 +197,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                 )}
 
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="enable_ddns"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
@@ -217,7 +217,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="hide_for_guest"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
@@ -237,7 +237,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="note"
                                     render={({ field }) => (
                                         <FormItem>
@@ -250,7 +250,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={form.control as any}
                                     name="public_note"
                                     render={({ field }) => (
                                         <FormItem>
