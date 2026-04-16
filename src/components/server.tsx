@@ -256,9 +256,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel className="flex justify-between items-center w-full">
                                                 <span>{t("Public") + t("Note")}</span>
-                                                <a href="/nzcfg.html" target="_blank" className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1" onClick={(e) => {
+                                                <a href="/dashboard/nzcfg.html" target="_blank" className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1" onClick={(e) => {
                                                     e.preventDefault();
-                                                    const popup = window.open('/nzcfg.html', 'nzcfg', 'width=1000,height=800');
+                                                    const popup = window.open('/dashboard/nzcfg.html', 'nzcfg', 'width=1000,height=800');
                                                     if(popup) {
                                                         const timer = setInterval(() => {
                                                             if(popup.closed) {
