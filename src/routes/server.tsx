@@ -212,7 +212,9 @@ export default function ServerPage() {
                             })
                         }}
                     />
-                    <BatchMoveServerIcon serverIds={selectedRows.map((r) => r.original.id) as number[]} />
+                    <BatchMoveServerIcon
+                        serverIds={selectedRows.map((r) => r.original.id) as number[]}
+                    />
                     <ServerConfigCardBatch
                         sid={selectedRows.map((r) => r.original.id) as number[]}
                         className="shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-yellow-600 text-white hover:bg-yellow-500 dark:hover:bg-yellow-700 rounded-lg"

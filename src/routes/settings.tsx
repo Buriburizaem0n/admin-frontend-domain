@@ -3,6 +3,7 @@ import { SettingsTab } from "@/components/settings-tab"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Combobox } from "@/components/ui/combobox"
 import {
     Form,
     FormControl,
@@ -21,9 +22,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Combobox } from "@/components/ui/combobox"
-import { useNotification } from "@/hooks/useNotfication"
 import { useAuth } from "@/hooks/useAuth"
+import { useNotification } from "@/hooks/useNotfication"
 import useSetting from "@/hooks/useSetting"
 import { asOptionalField } from "@/lib/utils"
 import { nezhaLang, settingCoverageTypes } from "@/types"
@@ -151,7 +151,11 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Expiry Notification Group ID</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="Enter Group ID" {...field} />
+                                        <Input
+                                            type="number"
+                                            placeholder="Enter Group ID"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -177,7 +181,10 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Custom Logo URL</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="https://example.com/logo.png" {...field} />
+                                        <Input
+                                            placeholder="https://example.com/logo.png"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -203,7 +210,10 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Custom Links (JSON Array)</FormLabel>
                                     <FormControl>
-                                        <Input placeholder='[{"link":"https://loohui.com/","name":"Blog","blank":false}]' {...field} />
+                                        <Input
+                                            placeholder='[{"link":"https://loohui.com/","name":"Blog","blank":false}]'
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -216,7 +226,10 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Background Image (Day)</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="https://example.com/day.jpg" {...field} />
+                                        <Input
+                                            placeholder="https://example.com/day.jpg"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -229,7 +242,10 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Background Image (Night)</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="https://example.com/night.jpg" {...field} />
+                                        <Input
+                                            placeholder="https://example.com/night.jpg"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

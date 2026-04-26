@@ -177,11 +177,21 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
-                                                {form.watch("type") == 2 ? "SMTP Server (host:port)" : 
-                                                 form.watch("type") == 3 ? "Bot Token" : "URL"}
+                                                {form.watch("type") == 2
+                                                    ? "SMTP Server (host:port)"
+                                                    : form.watch("type") == 3
+                                                      ? "Bot Token"
+                                                      : "URL"}
                                             </FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={form.watch("type") == 3 ? "123456:ABC-DEF" : ""} />
+                                                <Input
+                                                    {...field}
+                                                    placeholder={
+                                                        form.watch("type") == 3
+                                                            ? "123456:ABC-DEF"
+                                                            : ""
+                                                    }
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -234,11 +244,13 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {Object.entries(nrequestTypes).map(([k, v]) => (
-                                                                <SelectItem key={k} value={k}>
-                                                                    {v}
-                                                                </SelectItem>
-                                                            ))}
+                                                            {Object.entries(nrequestTypes).map(
+                                                                ([k, v]) => (
+                                                                    <SelectItem key={k} value={k}>
+                                                                        {v}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -253,15 +265,21 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
-                                                {form.watch("type") == 2 ? "SMTP User:Pass" : 
-                                                 form.watch("type") == 3 ? "Chat ID" : t("RequestHeader")}
+                                                {form.watch("type") == 2
+                                                    ? "SMTP User:Pass"
+                                                    : form.watch("type") == 3
+                                                      ? "Chat ID"
+                                                      : t("RequestHeader")}
                                             </FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className="resize-y"
                                                     placeholder={
-                                                        form.watch("type") == 2 ? "user:pass" : 
-                                                        form.watch("type") == 3 ? "123456789" : '{"User-Agent":"Nezha-Agent"}'
+                                                        form.watch("type") == 2
+                                                            ? "user:pass"
+                                                            : form.watch("type") == 3
+                                                              ? "123456789"
+                                                              : '{"User-Agent":"Nezha-Agent"}'
                                                     }
                                                     {...field}
                                                 />
@@ -276,11 +294,23 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         name="request_body"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{form.watch("type") == 2 ? "Recipient Email" : t("RequestBody")}</FormLabel>
+                                                <FormLabel>
+                                                    {form.watch("type") == 2
+                                                        ? "Recipient Email"
+                                                        : t("RequestBody")}
+                                                </FormLabel>
                                                 <FormControl>
                                                     <Textarea
-                                                        className={form.watch("type") == 2 ? "resize-y" : "resize-y h-[240px]"}
-                                                        placeholder={form.watch("type") == 2 ? "target@example.com" : '...'}
+                                                        className={
+                                                            form.watch("type") == 2
+                                                                ? "resize-y"
+                                                                : "resize-y h-[240px]"
+                                                        }
+                                                        placeholder={
+                                                            form.watch("type") == 2
+                                                                ? "target@example.com"
+                                                                : "..."
+                                                        }
                                                         {...field}
                                                     />
                                                 </FormControl>

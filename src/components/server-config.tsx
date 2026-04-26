@@ -160,13 +160,17 @@ export const ServerConfigCard = ({ sid, menuItem = false, ...props }: ServerConf
     const onSubmit = async (values: any) => {
         let resp: ModelServerTaskResponse = {}
         try {
-            values.nic_allowlist = values.nic_allowlist_raw
-                ? JSON.parse(values.nic_allowlist_raw)
+            const submitValues = { ...values }
+            submitValues.nic_allowlist = submitValues.nic_allowlist_raw
+                ? JSON.parse(submitValues.nic_allowlist_raw)
                 : undefined
-            values.hard_drive_partition_allowlist = values.hard_drive_partition_allowlist_raw
-                ? JSON.parse(values.hard_drive_partition_allowlist_raw)
-                : undefined
-            resp = await setServerConfig({ config: JSON.stringify(values), servers: [sid] })
+            submitValues.hard_drive_partition_allowlist =
+                submitValues.hard_drive_partition_allowlist_raw
+                    ? JSON.parse(submitValues.hard_drive_partition_allowlist_raw)
+                    : undefined
+            delete submitValues.nic_allowlist_raw
+            delete submitValues.hard_drive_partition_allowlist_raw
+            resp = await setServerConfig({ config: JSON.stringify(submitValues), servers: [sid] })
         } catch (e) {
             console.error(e)
             toast(t("Error"), {

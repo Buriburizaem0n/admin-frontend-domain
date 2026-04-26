@@ -28,7 +28,7 @@ import { conv } from "@/lib/utils"
 import { asOptionalField } from "@/lib/utils"
 import { ModelServer } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -65,11 +65,13 @@ const serverFormSchema = z.object({
             },
         ),
     ),
-    billing_data: z.object({
-        registrar: asOptionalField(z.string()),
-        endDate: asOptionalField(z.string()),
-        notes: asOptionalField(z.string()),
-    }).optional(),
+    billing_data: z
+        .object({
+            registrar: asOptionalField(z.string()),
+            endDate: asOptionalField(z.string()),
+            notes: asOptionalField(z.string()),
+        })
+        .optional(),
 })
 
 export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
@@ -92,16 +94,16 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
 
     useEffect(() => {
         const handleMessage = (e: MessageEvent) => {
-            if (e.data?.type === 'NZCFG_JSON') {
-                if (e.data.target === 'public_note') {
-                    form.setValue('public_note', e.data.payload);
-                    toast(t("Success"), { description: "配置已通过可视化构建器自动填入" });
+            if (e.data?.type === "NZCFG_JSON") {
+                if (e.data.target === "public_note") {
+                    form.setValue("public_note", e.data.payload)
+                    toast(t("Success"), { description: "配置已通过可视化构建器自动填入" })
                 }
             }
-        };
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
-    }, [form, t]);
+        }
+        window.addEventListener("message", handleMessage)
+        return () => window.removeEventListener("message", handleMessage)
+    }, [form, t])
 
     const onSubmit = async (values: any) => {
         try {
@@ -255,7 +257,9 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     )}
                                 />
                                 <div className="p-3 border rounded-md border-dashed space-y-2">
-                                    <Label className="text-xs text-muted-foreground uppercase font-bold">Billing & Expiry</Label>
+                                    <Label className="text-xs text-muted-foreground uppercase font-bold">
+                                        Billing & Expiry
+                                    </Label>
                                     <FormField
                                         control={form.control as any}
                                         name="billing_data.registrar"
@@ -263,7 +267,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <FormItem>
                                                 <FormLabel>Registrar</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="AWS / Azure /阿里云" {...field} />
+                                                    <Input
+                                                        placeholder="AWS / Azure /阿里云"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -276,7 +283,20 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                             <FormItem>
                                                 <FormLabel>Expiry Date</FormLabel>
                                                 <FormControl>
-                                                    <Input type="date" {...field} value={field.value?.split('T')[0] || ''} onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : '')} />
+                                                    <Input
+                                                        type="date"
+                                                        {...field}
+                                                        value={field.value?.split("T")[0] || ""}
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value
+                                                                    ? new Date(
+                                                                          e.target.value,
+                                                                      ).toISOString()
+                                                                    : "",
+                                                            )
+                                                        }
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -290,18 +310,28 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel className="flex justify-between items-center w-full">
                                                 <span>{t("Public") + t("Note")}</span>
-                                                <a href="/dashboard/nzcfg.html" target="_blank" className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1" onClick={(e) => {
-                                                    e.preventDefault();
-                                                    const popup = window.open('/dashboard/nzcfg.html', 'nzcfg', 'width=1000,height=800');
-                                                    if(popup) {
-                                                        const timer = setInterval(() => {
-                                                            if(popup.closed) {
-                                                                clearInterval(timer);
-                                                            }
-                                                        }, 500);
-                                                    }
-                                                }}>
-                                                    可视化管理配置 <i className="fa-solid fa-up-right-from-square"></i>
+                                                <a
+                                                    href="/dashboard/nzcfg.html"
+                                                    target="_blank"
+                                                    className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        const popup = window.open(
+                                                            "/dashboard/nzcfg.html",
+                                                            "nzcfg",
+                                                            "width=1000,height=800",
+                                                        )
+                                                        if (popup) {
+                                                            const timer = setInterval(() => {
+                                                                if (popup.closed) {
+                                                                    clearInterval(timer)
+                                                                }
+                                                            }, 500)
+                                                        }
+                                                    }}
+                                                >
+                                                    可视化管理配置{" "}
+                                                    <i className="fa-solid fa-up-right-from-square"></i>
                                                 </a>
                                             </FormLabel>
                                             <FormControl>
