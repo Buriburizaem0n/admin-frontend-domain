@@ -2,6 +2,7 @@
 import {
     addDomain,
     deleteDomain,
+    syncAllDomains,
     syncDomainWHOIS,
     updateDomain,
     useDomainList,
@@ -73,6 +74,7 @@ export default function DomainPage() {
         data: domainData,
         error,
         mutate,
+        isValidating,
     } = useSWR("/api/v1/domains", useDomainList, { revalidateOnFocus: false })
 
     useEffect(() => {
@@ -85,6 +87,16 @@ export default function DomainPage() {
             setIsLoading(false)
         }
     }, [domainData, error])
+
+    const handleRefreshAll = async () => {
+        try {
+            await syncAllDomains()
+            toast.success("刷新成功", { description: "已触发所有域名的状态同步。" })
+            mutate()
+        } catch (err) {
+            toast.error("刷新失败", { description: (err as Error).message })
+        }
+    }
 
     const handleAddDomain = async () => {
         if (!newDomainName) {
@@ -219,10 +231,10 @@ export default function DomainPage() {
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => mutate()}
-                            disabled={isLoading}
+                            onClick={handleRefreshAll}
+                            disabled={isValidating}
                         >
-                            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                            <RefreshCw className={`h-4 w-4 ${isValidating ? "animate-spin" : ""}`} />
                         </Button>
                         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                             <DialogTrigger asChild>

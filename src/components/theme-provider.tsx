@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { DateTime } from "luxon"
 
 export type Theme = "dark" | "light" | "system"
 
@@ -30,22 +31,28 @@ export function ThemeProvider({
         () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
     )
 
+    const [hour, setHour] = useState(() => DateTime.now().hour)
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setHour(DateTime.now().hour)
+        }, 60000)
+        return () => clearInterval(timer)
+    }, [])
+
     useEffect(() => {
         const root = window.document.documentElement
 
         root.classList.remove("light", "dark")
 
+        let effectiveTheme = theme
         if (theme === "system") {
-            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light"
-
-            root.classList.add(systemTheme)
-            return
+            const isNight = hour >= 18 || hour < 6
+            effectiveTheme = isNight ? "dark" : "light"
         }
 
-        root.classList.add(theme)
-    }, [theme])
+        root.classList.add(effectiveTheme)
+    }, [theme, hour])
 
     const value = {
         theme,

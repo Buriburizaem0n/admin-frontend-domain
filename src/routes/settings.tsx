@@ -57,6 +57,8 @@ const settingFormSchema = z.object({
     custom_links: asOptionalField(z.string()),
     background_image_day: asOptionalField(z.string()),
     background_image_night: asOptionalField(z.string()),
+    telegram_bot_token: asOptionalField(z.string()),
+    telegram_admin_chat_id: asOptionalField(z.string()),
 })
 
 export default function SettingsPage() {
@@ -246,6 +248,32 @@ export default function SettingsPage() {
                                             placeholder="https://example.com/night.jpg"
                                             {...field}
                                         />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="telegram_bot_token"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Telegram Bot Token</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="123456789:ABCDEF..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="telegram_admin_chat_id"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Telegram Admin Chat ID</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="12345678" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

@@ -55,9 +55,9 @@ const notificationFormSchema = z.object({
     request_type: z.coerce.number().int().min(1).max(255),
     request_header: z.string(),
     request_body: z.string(),
-    verify_tls: asOptionalField(z.boolean()),
-    skip_check: asOptionalField(z.boolean()),
-    format_metric_units: asOptionalField(z.boolean()),
+    verify_tls: z.boolean().default(false),
+    skip_check: z.boolean().default(false),
+    format_metric_units: z.boolean().default(false),
     type: z.coerce.number().int().default(1),
 })
 
@@ -75,9 +75,9 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_type: data.request_type ?? 1,
                   request_header: data.request_header ?? "",
                   request_body: data.request_body ?? "",
-                  verify_tls: (data as any).verify_tls ?? false,
-                  skip_check: (data as any).skip_check ?? false,
-                  format_metric_units: (data as any).format_metric_units ?? false,
+                  verify_tls: data.verify_tls ?? false,
+                  skip_check: data.skip_check ?? false,
+                  format_metric_units: data.format_metric_units ?? false,
                   type: data.type ?? 1,
               }
             : {
@@ -319,66 +319,64 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         )}
                                     />
                                 )}
-                                <FormField
-                                    control={form.control}
-                                    name="verify_tls"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">
+                                <div className="pt-4 border-t space-y-3">
+                                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                        {t("AdvancedSettings")}
+                                    </Label>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="verify_tls"
+                                            render={({ field }) => (
+                                                <FormItem className="flex items-center space-x-2 space-y-0 py-1">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="text-sm font-normal cursor-pointer">
                                                         {t("VerifyTLS")}
-                                                    </Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="skip_check"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="skip_check"
+                                            render={({ field }) => (
+                                                <FormItem className="flex items-center space-x-2 space-y-0 py-1">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="text-sm font-normal cursor-pointer">
                                                         {t("DoNotSendTestMessage")}
-                                                    </Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="format_metric_units"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                    <Label className="text-sm">
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="format_metric_units"
+                                            render={({ field }) => (
+                                                <FormItem className="flex items-center space-x-2 space-y-0 py-1">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="text-sm font-normal cursor-pointer">
                                                         {t("FormatMetricUnits")}
-                                                    </Label>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">

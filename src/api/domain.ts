@@ -51,3 +51,8 @@ export const updateDomain = (
 export const syncDomainWHOIS = (id: number) => {
     return fetcher<Domain>(FetcherMethod.POST, `/api/v1/domains/${id}/sync`)
 }
+
+// 同步所有域名
+export const syncAllDomains = () => {
+    return fetcher<any>(FetcherMethod.POST, "/api/v1/domains/sync-all")
+}

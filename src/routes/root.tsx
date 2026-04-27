@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/sonner"
 import useSetting from "@/hooks/useSetting"
 import i18n from "@/lib/i18n"
 import { InjectContext } from "@/lib/inject"
-import { useEffect } from "react"
+import { DateTime } from "luxon"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Outlet } from "react-router-dom"
 
@@ -36,8 +37,10 @@ export default function Root() {
 
     return (
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            <section className="text-sm mx-auto h-full flex flex-col justify-between">
-                <div>
+            <section
+                className="text-sm mx-auto h-full flex flex-col justify-between relative z-10 bg-background"
+            >
+                <div className="flex-1">
                     <Header />
                     <div className="max-w-5xl mx-auto">
                         <Outlet />
