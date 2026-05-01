@@ -83,7 +83,7 @@ export default function NotificationPage() {
             accessorFn: (row) => {
                 return (
                     notifierGroup
-                        ?.filter((ng) => ng.notifications?.includes(row.id))
+                        ?.filter((ng) => ng.notifications?.includes(row.id!))
                         .map((ng) => ng.group.id) || []
                 )
             },
@@ -112,7 +112,7 @@ export default function NotificationPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteNotification,
-                            id: s.id,
+                            id: s.id!,
                             mutate: mutate,
                         }}
                     >
@@ -143,7 +143,7 @@ export default function NotificationPage() {
                     className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteNotification,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >

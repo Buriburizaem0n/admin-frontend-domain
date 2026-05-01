@@ -397,6 +397,8 @@ export interface ModelNotification {
     updated_at?: string
     url: string
     verify_tls?: boolean
+    skip_check?: boolean
+    format_metric_units?: boolean
 }
 
 export interface ModelNotificationForm {
@@ -410,6 +412,8 @@ export interface ModelNotificationForm {
     skip_check?: boolean
     url?: string
     verify_tls?: boolean
+    skip_check?: boolean
+    format_metric_units?: boolean
 }
 
 export interface ModelNotificationGroup {
@@ -595,6 +599,7 @@ export interface ModelService {
     enable_trigger_task?: boolean
     /** 失败时执行的触发任务id */
     fail_trigger_tasks: number[]
+    display_index: number
     id?: number
     latency_notify?: boolean
     max_latency: number
@@ -689,6 +694,8 @@ export interface ModelSetting {
     custom_links?: string
     background_image_day?: string
     background_image_night?: string
+    telegram_bot_token?: string
+    telegram_admin_chat_id?: string
 }
 
 export interface ModelSettingForm {
@@ -722,6 +729,8 @@ export interface ModelSettingForm {
     background_image_day?: string
     /** 夜间背景图链接 */
     background_image_night?: string
+    telegram_bot_token?: string
+    telegram_admin_chat_id?: string
 }
 
 export interface ModelSettingResponse {

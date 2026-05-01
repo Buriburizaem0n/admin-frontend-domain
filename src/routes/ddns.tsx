@@ -121,7 +121,7 @@ export default function DDNSPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteDDNSProfiles,
-                            id: s.id,
+                            id: s.id!,
                             mutate: mutate,
                         }}
                     >
@@ -152,7 +152,7 @@ export default function DDNSPage() {
                     className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteDDNSProfiles,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >

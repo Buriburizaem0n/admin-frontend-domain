@@ -260,7 +260,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Telegram Bot Token</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="123456789:ABCDEF..." {...field} />
+                                        <Input placeholder="123456789:ABCDEF..." {...field} value={field.value as string || ""} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                     <FormLabel>Telegram Admin Chat ID</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="12345678" {...field} />
+                                        <Input placeholder="12345678" {...field} value={field.value as string || ""} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

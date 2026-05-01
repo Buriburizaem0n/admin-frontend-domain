@@ -22,7 +22,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
-import { ModelOnlineUser, ModelOnlineUserApi } from "@/types"
+import { GithubComNezhahqNezhaModelPaginatedResponseArrayModelOnlineUserModelOnlineUser, ModelOnlineUser } from "@/types"
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -40,7 +40,7 @@ export default function OnlineUserPage() {
     // 计算 offset
     const offset = (page - 1) * pageSize
 
-    const { data, mutate, error, isLoading } = useSWR<ModelOnlineUserApi, Error>(
+    const { data, mutate, error, isLoading } = useSWR<GithubComNezhahqNezhaModelPaginatedResponseArrayModelOnlineUserModelOnlineUser, Error>(
         `/api/v1/online-user?offset=${offset}&limit=${pageSize}`,
         swrFetcher,
     )
@@ -94,7 +94,7 @@ export default function OnlineUserPage() {
             accessorFn: (row) => row.connected_at,
             cell: ({ row }) => {
                 const s = row.original
-                const date = new Date(s.connected_at)
+                const date = new Date(s.connected_at!)
                 return <span>{date.toISOString()}</span>
             },
         },
@@ -125,7 +125,7 @@ export default function OnlineUserPage() {
     }
 
     const dataCache = useMemo(() => {
-        return data?.value ?? []
+        return data?.data?.value ?? []
     }, [data])
 
     const table = useReactTable<ModelOnlineUser>({
@@ -137,9 +137,9 @@ export default function OnlineUserPage() {
     const selectedRows = table.getSelectedRowModel().rows
 
     const renderPagination = () => {
-        if (!data?.pagination) return null
+        if (!data?.data?.pagination) return null
 
-        const { total } = data.pagination
+        const { total = 0 } = data.data.pagination
         const totalPages = Math.ceil(total / pageSize)
 
         const handlePageChange = (newPage: number) => {

@@ -106,7 +106,7 @@ export default function NATPage() {
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
-                        delete={{ fn: deleteNAT, id: s.id, mutate: mutate }}
+                        delete={{ fn: deleteNAT, id: s.id!, mutate: mutate }}
                     >
                         <NATCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
@@ -135,7 +135,7 @@ export default function NATPage() {
                     className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteNAT,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >

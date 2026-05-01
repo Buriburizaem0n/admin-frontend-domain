@@ -152,7 +152,7 @@ export default function ServicePage() {
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
-                        delete={{ fn: deleteService, id: s.id, mutate: mutate }}
+                        delete={{ fn: deleteService, id: s.id!, mutate: mutate }}
                     >
                         <ServiceCard mutate={mutate} data={s} />
                     </ActionButtonGroup>
@@ -181,7 +181,7 @@ export default function ServicePage() {
                     className="flex gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteService,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >

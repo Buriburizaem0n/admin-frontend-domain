@@ -98,13 +98,13 @@ export default function WAFPage() {
             header: t("LastBlockReason"),
             accessorKey: "lastBlockReason",
             accessorFn: (row) => row.block_reason,
-            cell: ({ row }) => <span>{wafBlockReasons[row.original.block_reason] || ""}</span>,
+            cell: ({ row }) => <span>{wafBlockReasons[row.original.block_reason!] || ""}</span>,
         },
         {
             header: t("BlockIdentifier"),
             accessorKey: "BlockIdentifier",
             accessorFn: (row) => {
-                return wafBlockIdentifiers[row.block_identifier] || row.block_identifier
+                return wafBlockIdentifiers[row.block_identifier!] || row.block_identifier
             },
         },
         {
@@ -158,7 +158,7 @@ export default function WAFPage() {
     const renderPagination = () => {
         if (!data?.pagination) return null
 
-        const { total } = data.pagination
+        const { total = 0 } = data.pagination
         const totalPages = Math.ceil(total / pageSize)
 
         const handlePageChange = (newPage: number) => {

@@ -164,7 +164,7 @@ export default function CronPage() {
                 return (
                     <ActionButtonGroup
                         className="flex gap-2"
-                        delete={{ fn: deleteCron, id: s.id, mutate: mutate }}
+                        delete={{ fn: deleteCron, id: s.id!, mutate: mutate }}
                     >
                         <>
                             <IconButton
@@ -172,7 +172,7 @@ export default function CronPage() {
                                 icon="play"
                                 onClick={async () => {
                                     try {
-                                        await runCron(s.id)
+                                        await runCron(s.id!)
                                     } catch (e) {
                                         console.error(e)
                                         toast(t("Error"), {
@@ -215,7 +215,7 @@ export default function CronPage() {
                     className="flex gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteCron,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >

@@ -97,7 +97,7 @@ export default function ServerGroupPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteServerGroups,
-                            id: s.group.id,
+                            id: s.group.id!,
                             mutate: mutate,
                         }}
                     >
@@ -128,7 +128,7 @@ export default function ServerGroupPage() {
                     className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
                     delete={{
                         fn: deleteServerGroups,
-                        id: selectedRows.map((r) => r.original.group.id),
+                        id: selectedRows.map((r) => r.original.group.id!),
                         mutate: mutate,
                     }}
                 >

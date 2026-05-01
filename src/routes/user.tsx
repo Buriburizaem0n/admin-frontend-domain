@@ -90,7 +90,7 @@ export default function UserPage() {
                         className="flex gap-2"
                         delete={{
                             fn: deleteUser,
-                            id: s.id,
+                            id: s.id!,
                             mutate: mutate,
                         }}
                     >
@@ -121,7 +121,7 @@ export default function UserPage() {
                     className="flex-2 flex gap-2 ml-auto"
                     delete={{
                         fn: deleteUser,
-                        id: selectedRows.map((r) => r.original.id),
+                        id: selectedRows.map((r) => r.original.id!),
                         mutate: mutate,
                     }}
                 >
