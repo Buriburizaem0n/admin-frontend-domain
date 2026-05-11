@@ -95,9 +95,12 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     useEffect(() => {
         const handleMessage = (e: MessageEvent) => {
             if (e.data?.type === "NZCFG_JSON") {
-                if (e.data.target === "public_note") {
-                    form.setValue("public_note", e.data.payload)
-                    toast(t("Success"), { description: "配置已通过可视化构建器自动填入" })
+                const target = e.data.target === "traffic" ? "public_note" : e.data.target
+                if (target === "public_note" || target === "note") {
+                    form.setValue(target, e.data.payload)
+                    toast(t("Success"), {
+                        description: `配置已自动填入${target === "public_note" ? t("PublicNote.Label") : t("Private") + t("Note")}`,
+                    })
                 }
             }
         }
@@ -127,24 +130,45 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <IconButton variant="outline" icon="edit" />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
-                    <div className="items-center mx-1">
-                        <DialogHeader>
-                            <DialogTitle>{t("EditServer")}</DialogTitle>
-                            <DialogDescription />
-                        </DialogHeader>
-                        <Form {...(form as any)}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
-                                <FormField
-                                    control={form.control as any}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
+        <>
+            <IconButton
+                variant="outline"
+                icon="edit"
+                onClick={() => {
+                    setOpen(true)
+                }}
+            />
+            <Dialog
+                open={open}
+                onOpenChange={(val) => {
+                    setOpen(val)
+                }}
+            >
+                <DialogContent
+                    className="sm:max-w-xl"
+                    onPointerDownOutside={(e) => {
+                        e.preventDefault()
+                    }}
+                    onInteractOutside={(e) => {
+                        e.preventDefault()
+                    }}
+                    onFocusOutside={(e) => {
+                        e.preventDefault()
+                    }}
+                >
+                    <ScrollArea className="max-h-[calc(100dvh-5rem)] p-3">
+                        <div className="items-center mx-1">
+                            <DialogHeader>
+                                <DialogTitle>{t("EditServer")}</DialogTitle>
+                                <DialogDescription />
+                            </DialogHeader>
+                            <Form {...(form as any)}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
+                                    <FormField
+                                        control={form.control as any}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
                                             <FormLabel>{t("Name")}</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="My Server" {...field} />
@@ -248,7 +272,26 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                     name="note"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("Private") + t("Note")}</FormLabel>
+                                            <FormLabel className="flex justify-between items-center w-full">
+                                                <span>{t("Private") + t("Note")}</span>
+                                                <Button
+                                                    variant="link"
+                                                    type="button"
+                                                    className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1 h-auto p-0"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        window.open(
+                                                            "/dashboard/nzcfg.html?target=note",
+                                                            "nzcfg",
+                                                            "width=1000,height=800",
+                                                        )
+                                                    }}
+                                                >
+                                                    可视化管理配置{" "}
+                                                    <i className="fa-solid fa-up-right-from-square"></i>
+                                                </Button>
+                                            </FormLabel>
                                             <FormControl>
                                                 <Textarea className="resize-none" {...field} />
                                             </FormControl>
@@ -256,53 +299,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="p-3 border rounded-md border-dashed space-y-2">
-                                    <Label className="text-xs text-muted-foreground uppercase font-bold">
-                                        Billing & Expiry
-                                    </Label>
-                                    <FormField
-                                        control={form.control as any}
-                                        name="billing_data.registrar"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Registrar</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="AWS / Azure /阿里云"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control as any}
-                                        name="billing_data.endDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Expiry Date</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="date"
-                                                        {...field}
-                                                        value={field.value?.split("T")[0] || ""}
-                                                        onChange={(e) =>
-                                                            field.onChange(
-                                                                e.target.value
-                                                                    ? new Date(
-                                                                          e.target.value,
-                                                                      ).toISOString()
-                                                                    : "",
-                                                            )
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+
                                 <FormField
                                     control={form.control as any}
                                     name="public_note"
@@ -310,29 +307,23 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         <FormItem>
                                             <FormLabel className="flex justify-between items-center w-full">
                                                 <span>{t("Public") + t("Note")}</span>
-                                                <a
-                                                    href="/dashboard/nzcfg.html"
-                                                    target="_blank"
-                                                    className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1"
+                                                <Button
+                                                    variant="link"
+                                                    type="button"
+                                                    className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1 h-auto p-0"
                                                     onClick={(e) => {
                                                         e.preventDefault()
-                                                        const popup = window.open(
-                                                            "/dashboard/nzcfg.html",
+                                                        e.stopPropagation()
+                                                        window.open(
+                                                            "/dashboard/nzcfg.html?target=public_note",
                                                             "nzcfg",
                                                             "width=1000,height=800",
                                                         )
-                                                        if (popup) {
-                                                            const timer = setInterval(() => {
-                                                                if (popup.closed) {
-                                                                    clearInterval(timer)
-                                                                }
-                                                            }, 500)
-                                                        }
                                                     }}
                                                 >
                                                     可视化管理配置{" "}
                                                     <i className="fa-solid fa-up-right-from-square"></i>
-                                                </a>
+                                                </Button>
                                             </FormLabel>
                                             <FormControl>
                                                 <Textarea className="resize-y" {...field} />
@@ -357,5 +348,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                 </ScrollArea>
             </DialogContent>
         </Dialog>
+        </>
     )
 }

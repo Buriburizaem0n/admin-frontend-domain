@@ -782,7 +782,7 @@
                         <button onclick="generatePublicNoteJSON()">生成 JSON</button>
                     </div>
                     <div class="col-right">
-                        <button class="copy-btn" onclick="copyToClipboard('jsonOutput')">
+                        <button class="copy-btn" onclick="copyToClipboard('jsonOutput', this)">
                             复制到剪贴板
                         </button>
                         <pre id="jsonOutput"><code class="language-json"></code></pre>
@@ -889,7 +889,7 @@
                         <button onclick="generateTrafficMonitorJSON()">生成 JSON</button>
                     </div>
                     <div class="col-right">
-                        <button class="copy-btn" onclick="copyToClipboard('jsonOutput2')">
+                        <button class="copy-btn" onclick="copyToClipboard('jsonOutput2', this)">
                             复制到剪贴板
                         </button>
                         <pre id="jsonOutput2"><code class="language-json"></code></pre>
@@ -976,20 +976,29 @@
                 }
             }
 
-            function copyToClipboard(elementId) {
+            function copyToClipboard(elementId, btn) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetParam = urlParams.get('target');
+                const oldText = btn ? btn.innerHTML : null;
+
                 var text = document.querySelector("#" + elementId + " code").innerText
                 navigator.clipboard.writeText(text).then(function () {
                     if (window.opener) {
                         window.opener.postMessage(
                             {
                                 type: "NZCFG_JSON",
-                                target: elementId === "jsonOutput" ? "public_note" : "traffic",
+                                target: targetParam || (elementId === "jsonOutput" ? "public_note" : "traffic"),
                                 payload: text,
                             },
                             "*",
                         )
-                        alert("已生成并同步至控制面板中！")
-                        window.close()
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-check"></i> 已同步至控制面板';
+                            btn.style.backgroundColor = '#2ecc71';
+                        }
+                        setTimeout(() => {
+                            window.close();
+                        }, 600);
                     } else {
                         alert("已复制到剪贴板！")
                     }

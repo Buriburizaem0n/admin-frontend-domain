@@ -30,7 +30,9 @@ import useSWR from "swr"
 
 export default function ServerPage() {
     const { t } = useTranslation()
-    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher)
+    const { data, mutate, error, isLoading } = useSWR<Server[]>("/api/v1/server", swrFetcher, {
+        revalidateOnFocus: false,
+    })
     const { serverGroups } = useServer()
 
     useEffect(() => {
@@ -41,116 +43,119 @@ export default function ServerPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns: ColumnDef<Server>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
-        {
-            header: "ID",
-            accessorKey: "id",
-            accessorFn: (row) => `${row.id}(${row.display_index})`,
-        },
-        {
-            header: t("Name"),
-            accessorKey: "name",
-            accessorFn: (row) => row.name,
-            cell: ({ row }) => {
-                const s = row.original
-                return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+    const columns = useMemo<ColumnDef<Server>[]>(
+        () => [
+            {
+                id: "select",
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableSorting: false,
+                enableHiding: false,
             },
-        },
-        {
-            header: t("Group"),
-            accessorKey: "groups",
-            accessorFn: (row) => {
-                return (
-                    serverGroups
-                        ?.filter((sg) => sg.servers?.includes(row.id!))
-                        .map((sg) => sg.group.id) || []
-                )
+            {
+                header: "ID",
+                accessorKey: "id",
+                accessorFn: (row) => `${row.id}(${row.display_index})`,
             },
-        },
-        {
-            id: "ip",
-            header: "IP",
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <div className="max-w-24 whitespace-normal break-words">
-                        {joinIP(s.geoip?.ip)}
-                    </div>
-                )
+            {
+                header: t("Name"),
+                accessorKey: "name",
+                accessorFn: (row) => row.name,
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                },
             },
-        },
-        {
-            header: t("Version"),
-            accessorKey: "host.version",
-            accessorFn: (row) => row.host?.version || t("Unknown"),
-        },
-        {
-            header: t("EnableDDNS"),
-            accessorKey: "enableDDNS",
-            accessorFn: (row) => row.enable_ddns ?? false,
-        },
-        {
-            header: t("HideForGuest"),
-            accessorKey: "hideForGuest",
-            accessorFn: (row) => row.hide_for_guest ?? false,
-        },
-        {
-            id: "note",
-            header: t("Note"),
-            cell: ({ row }) => {
-                const s = row.original
-                return <NoteMenu note={{ private: s.note, public: s.public_note }} />
+            {
+                header: t("Group"),
+                accessorKey: "groups",
+                accessorFn: (row) => {
+                    return (
+                        serverGroups
+                            ?.filter((sg) => sg.servers?.includes(row.id!))
+                            .map((sg) => sg.group.id) || []
+                    )
+                },
             },
-        },
-        {
-            id: "uuid",
-            header: "UUID",
-            cell: ({ row }) => {
-                const s = row.original
-                return <CopyButton text={s.uuid} />
+            {
+                id: "ip",
+                header: "IP",
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <div className="max-w-24 whitespace-normal break-words">
+                            {joinIP(s.geoip?.ip)}
+                        </div>
+                    )
+                },
             },
-        },
-        {
-            id: "actions",
-            header: t("Actions"),
-            cell: ({ row }) => {
-                const s = row.original
-                return (
-                    <ActionButtonGroup
-                        className="flex gap-2"
-                        delete={{ fn: deleteServer, id: s.id!, mutate: mutate }}
-                    >
-                        <>
-                            <ServerCard mutate={mutate} data={s} />
-                            <ServerConfigCard sid={s.id!} variant="outline" />
-                        </>
-                    </ActionButtonGroup>
-                )
+            {
+                header: t("Version"),
+                accessorKey: "host.version",
+                accessorFn: (row) => row.host?.version || t("Unknown"),
             },
-        },
-    ]
+            {
+                header: t("EnableDDNS"),
+                accessorKey: "enableDDNS",
+                accessorFn: (row) => row.enable_ddns ?? false,
+            },
+            {
+                header: t("HideForGuest"),
+                accessorKey: "hideForGuest",
+                accessorFn: (row) => row.hide_for_guest ?? false,
+            },
+            {
+                id: "note",
+                header: t("Note"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <NoteMenu note={{ private: s.note, public: s.public_note }} />
+                },
+            },
+            {
+                id: "uuid",
+                header: "UUID",
+                cell: ({ row }) => {
+                    const s = row.original
+                    return <CopyButton text={s.uuid} />
+                },
+            },
+            {
+                id: "actions",
+                header: t("Actions"),
+                cell: ({ row }) => {
+                    const s = row.original
+                    return (
+                        <ActionButtonGroup
+                            className="flex gap-2"
+                            delete={{ fn: deleteServer, id: s.id!, mutate: mutate }}
+                        >
+                            <>
+                                <ServerCard mutate={mutate} data={s} />
+                                <ServerConfigCard sid={s.id!} variant="outline" />
+                            </>
+                        </ActionButtonGroup>
+                    )
+                },
+            },
+        ],
+        [t, mutate, serverGroups],
+    )
 
     const dataCache = useMemo(() => {
         return data ?? []
