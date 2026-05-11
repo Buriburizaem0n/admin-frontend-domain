@@ -141,6 +141,7 @@ const generateCommand = (
         `NZ_SERVER=${install_host}`,
         `NZ_TLS=${tls || false}`,
         `NZ_CLIENT_SECRET=${agent_secret}`,
+        `NZ_DASHBOARD_URL=${window.location.origin}`,
     ]
     if (uuid) envParts.push(`NZ_UUID=${uuid}`)
     const env = envParts.join(" ")
@@ -156,10 +157,10 @@ const generateCommand = (
     switch (type) {
         case OSTypes.Linux:
         case OSTypes.macOS: {
-            return `curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env ${env} ./agent.sh`
+            return `curl -L ${window.location.origin}/script/agent.sh -o agent.sh && chmod +x agent.sh && env ${env} ./agent.sh`
         }
         case OSTypes.Windows: {
-            return `${env_win} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.ps1 -OutFile C:\install.ps1;powershell.exe C:\install.ps1`
+            return `${env_win} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest ${window.location.origin}/script/agent.ps1 -OutFile C:\\install.ps1;powershell.exe C:\\install.ps1`
         }
         default: {
             throw new Error(`Unknown OS: ${type}`)
