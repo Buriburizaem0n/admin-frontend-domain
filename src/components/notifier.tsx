@@ -49,9 +49,9 @@ interface NotifierCardProps {
 
 const notificationFormSchema = z.object({
     name: z.string().min(1),
-    url: z.string().min(1),
-    request_method: z.coerce.number().int().min(1).max(255),
-    request_type: z.coerce.number().int().min(1).max(255),
+    url: z.string().default(""),
+    request_method: z.coerce.number().int().default(1),
+    request_type: z.coerce.number().int().default(1),
     request_header: z.string(),
     request_body: z.string(),
     verify_tls: z.boolean().default(false),
@@ -162,42 +162,33 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     <SelectItem value="1">Webhook</SelectItem>
-                                                    <SelectItem value="2">SMTP (Email)</SelectItem>
-                                                    <SelectItem value="3">Telegram</SelectItem>
+                                                    <SelectItem value="2">Email (Global)</SelectItem>
+                                                    <SelectItem value="3">Telegram (Global)</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="url"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                {form.watch("type") == 2
-                                                    ? "SMTP Server (host:port)"
-                                                    : form.watch("type") == 3
-                                                      ? "Bot Token"
-                                                      : "URL"}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={
-                                                        form.watch("type") == 3
-                                                            ? "123456:ABC-DEF"
-                                                            : ""
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                {form.watch("type") != 2 && form.watch("type") != 3 && (
+                                {form.watch("type") == 1 && (
                                     <>
+                                        <FormField
+                                            control={form.control}
+                                            name="url"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>URL</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            placeholder="https://..."
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
                                         <FormField
                                             control={form.control}
                                             name="request_method"
@@ -256,30 +247,35 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                                 </FormItem>
                                             )}
                                         />
+                                        <FormField
+                                            control={form.control}
+                                            name="request_header"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("RequestHeader")}</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            className="resize-y"
+                                                            placeholder={'{"User-Agent":"Nezha-Agent"}'}
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </>
                                 )}
                                 <FormField
                                     control={form.control}
-                                    name="request_header"
+                                    name="request_body"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
-                                                {form.watch("type") == 2
-                                                    ? "SMTP User:Pass"
-                                                    : form.watch("type") == 3
-                                                      ? "Chat ID"
-                                                      : t("RequestHeader")}
-                                            </FormLabel>
+                                            <FormLabel>{t("RequestBody")}</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    className="resize-y"
-                                                    placeholder={
-                                                        form.watch("type") == 2
-                                                            ? "user:pass"
-                                                            : form.watch("type") == 3
-                                                              ? "123456789"
-                                                              : '{"User-Agent":"Nezha-Agent"}'
-                                                    }
+                                                    className="resize-y h-[240px]"
+                                                    placeholder="..."
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -287,59 +283,30 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                {form.watch("type") != 3 && (
-                                    <FormField
-                                        control={form.control}
-                                        name="request_body"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    {form.watch("type") == 2
-                                                        ? "Recipient Email"
-                                                        : t("RequestBody")}
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Textarea
-                                                        className={
-                                                            form.watch("type") == 2
-                                                                ? "resize-y"
-                                                                : "resize-y h-[240px]"
-                                                        }
-                                                        placeholder={
-                                                            form.watch("type") == 2
-                                                                ? "target@example.com"
-                                                                : "..."
-                                                        }
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
                                 <div className="pt-4 border-t space-y-3">
                                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                         {t("AdvancedSettings")}
                                     </Label>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="verify_tls"
-                                            render={({ field }) => (
-                                                <FormItem className="flex items-center space-x-2 space-y-0 py-1">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className="text-sm font-normal cursor-pointer">
-                                                        {t("VerifyTLS")}
-                                                    </FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
+                                        {form.watch("type") == 1 && (
+                                            <FormField
+                                                control={form.control}
+                                                name="verify_tls"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex items-center space-x-2 space-y-0 py-1">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="text-sm font-normal cursor-pointer">
+                                                            {t("VerifyTLS")}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        )}
                                         <FormField
                                             control={form.control}
                                             name="skip_check"

@@ -121,7 +121,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/settings",
-                element: <SettingsPage />,
+                element: (
+                    <NotificationProvider withNotifierGroup>
+                        <SettingsPage />
+                    </NotificationProvider>
+                ),
             },
             {
                 path: "/dashboard/settings/user",

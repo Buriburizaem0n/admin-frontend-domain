@@ -696,6 +696,10 @@ export interface ModelSetting {
     background_image_night?: string
     telegram_bot_token?: string
     telegram_admin_chat_id?: string
+    smtp_server?: string
+    smtp_user?: string
+    smtp_password?: string
+    admin_email?: string
 }
 
 export interface ModelSettingForm {
@@ -731,6 +735,10 @@ export interface ModelSettingForm {
     background_image_night?: string
     telegram_bot_token?: string
     telegram_admin_chat_id?: string
+    smtp_server?: string
+    smtp_user?: string
+    smtp_password?: string
+    admin_email?: string
 }
 
 export interface ModelSettingResponse {

@@ -59,6 +59,13 @@ const settingFormSchema = z.object({
     background_image_night: asOptionalField(z.string()),
     telegram_bot_token: asOptionalField(z.string()),
     telegram_admin_chat_id: asOptionalField(z.string()),
+    smtp_server: asOptionalField(z.string()),
+    smtp_user: asOptionalField(z.string()),
+    smtp_password: asOptionalField(z.string()),
+    admin_email: asOptionalField(z.string()),
+    domain_expiry_notification_days: asOptionalField(z.string()),
+    server_expiry_notification_days: asOptionalField(z.string()),
+    expiry_notification_group_id: z.coerce.number().int().min(0),
 })
 
 export default function SettingsPage() {
@@ -95,6 +102,9 @@ export default function SettingsPage() {
                   site_name: "",
                   language: "",
                   user_template: "user-dist",
+                  expiry_notification_group_id: 0,
+                  domain_expiry_notification_days: "",
+                  server_expiry_notification_days: "",
               },
         resetOptions: {
             keepDefaultValues: false,
@@ -133,36 +143,6 @@ export default function SettingsPage() {
             <div>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
-                        <FormField
-                            control={form.control}
-                            name="ip_change_notification_group_id"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("IPChangeNotificationGroupID")}</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="expiry_notification_group_id"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Expiry Notification Group ID</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder="Enter Group ID"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         <FormField
                             control={form.control}
                             name="site_name"
@@ -274,6 +254,58 @@ export default function SettingsPage() {
                                     <FormLabel>Telegram Admin Chat ID</FormLabel>
                                     <FormControl>
                                         <Input placeholder="12345678" {...field} value={field.value as string || ""} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="smtp_server"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>SMTP Server (host:port)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="smtp.example.com:465" {...field} value={field.value as string || ""} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="smtp_user"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>SMTP User</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="user@example.com" {...field} value={field.value as string || ""} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="smtp_password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>SMTP Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder="••••••••" {...field} value={field.value as string || ""} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="admin_email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Admin Email (Recipient)</FormLabel>
+                                    <FormControl>
+                                        <Input type="email" placeholder="admin@example.com" {...field} value={field.value as string || ""} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -540,6 +572,70 @@ export default function SettingsPage() {
                                 </FormItem>
                             )}
                         />
+                        <FormItem>
+                            <FormLabel>{t("ExpiryNotification")}</FormLabel>
+                            <Card className="w-full">
+                                <CardContent>
+                                    <div className="flex flex-col space-y-4 mt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="expiry_notification_group_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("NotificationGroup")}</FormLabel>
+                                                    <Combobox
+                                                        options={ngroupList}
+                                                        defaultValue={`${field.value}`}
+                                                        onValueChange={field.onChange}
+                                                    />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="domain_expiry_notification_days"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {t("DomainNotificationDays") +
+                                                            " " +
+                                                            t("SeparateWithComma")}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="60,30,15,7,3,1,0"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="server_expiry_notification_days"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {t("ServerNotificationDays") +
+                                                            " " +
+                                                            t("SeparateWithComma")}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="30,15,7,3,1,0"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </FormItem>
                         <FormItem>
                             <FormLabel>{t("IPChangeNotification")}</FormLabel>
                             <Card className="w-full">
