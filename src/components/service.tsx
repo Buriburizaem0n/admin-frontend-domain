@@ -56,8 +56,8 @@ const serviceFormSchema = z.object({
     cover: z.coerce.number().int().min(0),
     display_index: z.coerce.number().int(),
     duration: z.coerce.number().int().min(30),
-    enable_show_in_service: asOptionalField(z.boolean()),
     enable_trigger_task: asOptionalField(z.boolean()),
+    hide_for_guest: asOptionalField(z.boolean()),
     fail_trigger_tasks: z.array(z.number()),
     fail_trigger_tasks_raw: z.string(),
     latency_notify: asOptionalField(z.boolean()),
@@ -113,11 +113,14 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
         values.skip_servers = conv.arrToRecord(values.skip_servers_raw)
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
-        const { skip_servers_raw, ...requiredFields } = values
+        const requiredFields = { ...values }
+        delete (requiredFields as Record<string, unknown>).skip_servers_raw
         try {
-            data?.id
-                ? await updateService(data.id, requiredFields)
-                : await createService(requiredFields)
+            if (data?.id) {
+                await updateService(data.id, requiredFields)
+            } else {
+                await createService(requiredFields)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -232,7 +235,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="enable_show_in_service"
+                                    name="hide_for_guest"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
@@ -242,7 +245,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ data, mutate }) => {
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">
-                                                        {t("ShowInService")}
+                                                        {t("HideForGuest")}
                                                     </Label>
                                                 </div>
                                             </FormControl>

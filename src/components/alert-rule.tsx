@@ -36,7 +36,7 @@ import { ModelAlertRule } from "@/types"
 import { triggerModes } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
@@ -50,13 +50,15 @@ interface AlertRuleCardProps {
     mutate: KeyedMutator<ModelAlertRule[]>
 }
 
+const cycleUnitSchema = z.enum(["hour", "day", "week", "month", "year"])
+
 const ruleSchema = z.object({
     type: z.string(),
     min: z.number().optional(),
     max: z.number().optional(),
     cycle_start: z.string().optional(),
     cycle_interval: z.number().optional(),
-    cycle_unit: z.enum(["hour", "day", "week", "month", "year"]).optional(),
+    cycle_unit: cycleUnitSchema.optional(),
     duration: z.number().optional(),
     cover: z.number().int().min(0),
     ignore: z.record(z.string(), z.boolean()).optional(),
@@ -71,7 +73,7 @@ const alertRuleFormSchema = z.object({
             try {
                 JSON.parse(val)
                 return true
-            } catch (e) {
+            } catch {
                 return false
             }
         },
@@ -92,10 +94,12 @@ const alertRuleFormSchema = z.object({
 export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
 
-    type AlertRuleFormData = z.infer<typeof alertRuleFormSchema>
+    type AlertRuleEntry = z.output<typeof ruleSchema>
+    type AlertRuleFormInput = z.input<typeof alertRuleFormSchema>
+    type AlertRuleFormData = z.output<typeof alertRuleFormSchema>
 
-    const form = useForm({
-        resolver: zodResolver(alertRuleFormSchema) as any,
+    const form = useForm<AlertRuleFormInput, unknown, AlertRuleFormData>({
+        resolver: zodResolver(alertRuleFormSchema),
         defaultValues: data
             ? {
                   ...data,
@@ -124,14 +128,16 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
     // 结构化规则编辑状态：从已有数据或 rules_raw 初始化
     const initialRules = (() => {
         try {
-            if (data?.rules) return data.rules as any[]
+            if (data?.rules) return data.rules
             const raw = form.getValues("rules_raw")
-            return raw ? JSON.parse(raw) : []
+            if (!raw) return []
+            const parsed: unknown = JSON.parse(raw)
+            return z.array(ruleSchema).parse(parsed)
         } catch {
             return []
         }
     })()
-    const [rulesUI, setRulesUI] = useState<any[]>(initialRules)
+    const [rulesUI, setRulesUI] = useState<AlertRuleEntry[]>(initialRules)
 
     // 同步到 rules_raw（提交仍走 JSON 字符串）
     useEffect(() => {
@@ -140,17 +146,22 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
         } catch {
             // ignore
         }
-    }, [rulesUI])
+    }, [form, rulesUI])
+
+    const rulesRaw = useWatch({ control: form.control, name: "rules_raw" })
 
     const onSubmit = async (values: AlertRuleFormData) => {
-        values.rules = JSON.parse(values.rules_raw)
+        values.rules = z.array(ruleSchema).parse(JSON.parse(values.rules_raw))
         values.fail_trigger_tasks = conv.strToArr(values.fail_trigger_tasks_raw).map(Number)
         values.recover_trigger_tasks = conv.strToArr(values.recover_trigger_tasks_raw).map(Number)
-        const { rules_raw, ...requiredFields } = values
+        const requiredFields = { ...values }
+        delete (requiredFields as Record<string, unknown>).rules_raw
         try {
-            data?.id
-                ? await updateAlertRule(data.id, requiredFields)
-                : await createAlertRule(requiredFields)
+            if (data?.id) {
+                await updateAlertRule(data.id, requiredFields)
+            } else {
+                await createAlertRule(requiredFields)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -184,10 +195,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit as any)}
-                                className="space-y-2 my-2"
-                            >
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -531,7 +539,10 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                                         const next = [...rulesUI]
                                                                         next[idx] = {
                                                                             ...next[idx],
-                                                                            cycle_unit: val,
+                                                                            cycle_unit:
+                                                                                cycleUnitSchema.parse(
+                                                                                    val,
+                                                                                ),
                                                                         }
                                                                         setRulesUI(next)
                                                                     }}
@@ -603,7 +614,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                     <FormControl>
                                         <Textarea
                                             className="resize-y"
-                                            value={form.watch("rules_raw")}
+                                            value={rulesRaw}
                                             onChange={(e) => {
                                                 // 同步到结构化编辑器
                                                 form.setValue("rules_raw", e.target.value, {
@@ -630,7 +641,7 @@ export const AlertRuleCard: React.FC<AlertRuleCardProps> = ({ data, mutate }) =>
                                                     placeholder={t("Search")}
                                                     options={ngroupList}
                                                     onValueChange={field.onChange}
-                                                    defaultValue={field.value.toString()}
+                                                    defaultValue={String(field.value ?? "")}
                                                 />
                                             </FormControl>
                                             <FormMessage />

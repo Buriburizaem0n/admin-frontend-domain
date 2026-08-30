@@ -64,9 +64,11 @@ export const ServerGroupCard: React.FC<ServerGroupCardProps> = ({ data, mutate }
 
     const onSubmit = async (values: z.infer<typeof serverGroupFormSchema>) => {
         try {
-            data?.group.id
-                ? await updateServerGroup(data.group.id, values)
-                : await createServerGroup(values)
+            if (data?.group.id) {
+                await updateServerGroup(data.group.id, values)
+            } else {
+                await createServerGroup(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {

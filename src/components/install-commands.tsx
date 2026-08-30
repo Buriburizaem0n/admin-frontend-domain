@@ -147,11 +147,11 @@ const generateCommand = (
     const env = envParts.join(" ")
 
     const envWinParts = [
-        `$env:NZ_SERVER=\"${install_host}\";`,
-        `$env:NZ_TLS=\"${tls || false}\";`,
-        `$env:NZ_CLIENT_SECRET=\"${agent_secret}\";`,
+        `$env:NZ_SERVER="${install_host}";`,
+        `$env:NZ_TLS="${tls || false}";`,
+        `$env:NZ_CLIENT_SECRET="${agent_secret}";`,
     ]
-    if (uuid) envWinParts.push(`$env:NZ_UUID=\"${uuid}\";`)
+    if (uuid) envWinParts.push(`$env:NZ_UUID="${uuid}";`)
     const env_win = envWinParts.join("")
 
     switch (type) {
@@ -161,6 +161,7 @@ const generateCommand = (
         }
         case OSTypes.Windows: {
             return `${env_win} [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3 -bor [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12;set-ExecutionPolicy RemoteSigned;Invoke-WebRequest ${window.location.origin}/script/agent.ps1 -OutFile C:\\install.ps1;powershell.exe C:\\install.ps1`
+
         }
         default: {
             throw new Error(`Unknown OS: ${type}`)

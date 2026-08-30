@@ -51,6 +51,7 @@ const pages = [
     { href: "/dashboard/nat", label: i18next.t("NATT") },
     { href: "/dashboard/domain", label: i18next.t("Domain") }, // <-- 新增的域名监控链接
     { href: "/dashboard/server-group", label: i18next.t("Group") },
+    { href: "/dashboard/transfer", label: i18next.t("Transfer.Title") },
 ]
 // ^^^^^^^^^^^ 1. 在这里为移动端菜单添加新页面 ^^^^^^^^^^^
 // =======================================================
@@ -59,6 +60,7 @@ export default function Header() {
     const { t } = useTranslation()
     const { logout } = useAuth()
     const profile = useMainStore((store) => store.profile)
+    const isAdmin = profile?.role === 0
 
     const location = useLocation()
     const isDesktop = useMediaQuery("(min-width: 890px)")
@@ -146,18 +148,20 @@ export default function Header() {
                                                         {t("Profile")}
                                                     </div>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setDropdownOpen(false)
-                                                        navigate("/dashboard/settings")
-                                                    }}
-                                                    className="cursor-pointer"
-                                                >
-                                                    <div className="flex items-center gap-2 w-full">
-                                                        <Settings />
-                                                        {t("Settings")}
-                                                    </div>
-                                                </DropdownMenuItem>
+                                                {isAdmin && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            setDropdownOpen(false)
+                                                            navigate("/dashboard/settings")
+                                                        }}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <div className="flex items-center gap-2 w-full">
+                                                            <Settings />
+                                                            {t("Settings")}
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                )}
                                             </DropdownMenuGroup>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem
@@ -264,6 +268,15 @@ export default function Header() {
                                     <Link to="/dashboard/server-group">{t("Group")}</Link>
                                 </NzNavigationMenuLink>
                             </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NzNavigationMenuLink
+                                    asChild
+                                    active={location.pathname === "/dashboard/transfer"}
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    <Link to="/dashboard/transfer">{t("Transfer.Title")}</Link>
+                                </NzNavigationMenuLink>
+                            </NavigationMenuItem>
                         </>
                     )}
                 </div>
@@ -353,18 +366,20 @@ export default function Header() {
                                             {t("Profile")}
                                         </div>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setDropdownOpen(false)
-                                            navigate("/dashboard/settings")
-                                        }}
-                                        className="cursor-pointer"
-                                    >
-                                        <div className="flex items-center gap-2 w-full">
-                                            <Settings />
-                                            {t("Settings")}
-                                        </div>
-                                    </DropdownMenuItem>
+                                    {isAdmin && (
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setDropdownOpen(false)
+                                                navigate("/dashboard/settings")
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-2 w-full">
+                                                <Settings />
+                                                {t("Settings")}
+                                            </div>
+                                        </DropdownMenuItem>
+                                    )}
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={logout} className="cursor-pointer">
@@ -399,8 +414,7 @@ const useInterval = (callback: () => void, delay?: number | null) => {
 function Overview() {
     const { t } = useTranslation()
     const profile = useMainStore((store) => store.profile)
-    const timeOption = DateTime.TIME_SIMPLE
-    timeOption.hour12 = true
+    const timeOption = { ...DateTime.TIME_SIMPLE, hour12: true }
     const [timeString, setTimeString] = useState(
         DateTime.now().setLocale("en-US").toLocaleString(timeOption),
     )

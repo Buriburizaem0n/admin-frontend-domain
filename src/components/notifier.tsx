@@ -62,10 +62,14 @@ const notificationFormSchema = z.object({
 
 export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    type notificationFormData = z.infer<typeof notificationFormSchema>
+    type NotificationFormInput = z.input<typeof notificationFormSchema>
+    type NotificationFormData = z.output<typeof notificationFormSchema>
+    type NotificationDefaults = ModelNotification &
+        Partial<Pick<NotificationFormData, "skip_check">>
+    const notificationDefaults: NotificationDefaults | undefined = data
 
-    const form = useForm({
-        resolver: zodResolver(notificationFormSchema) as any,
+    const form = useForm<NotificationFormInput, unknown, NotificationFormData>({
+        resolver: zodResolver(notificationFormSchema),
         defaultValues: data
             ? {
                   name: data.name ?? "",
@@ -75,10 +79,12 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                   request_header: data.request_header ?? "",
                   request_body: data.request_body ?? "",
                   verify_tls: data.verify_tls ?? false,
-                  skip_check: data.skip_check ?? false,
+                  skip_check: notificationDefaults?.skip_check ?? false,
                   format_metric_units: data.format_metric_units ?? false,
-                  type: data.type ?? 1,
+                  type: (data as any)?.type ?? 1,
               }
+
+
             : {
                   name: "",
                   url: "",
@@ -98,9 +104,13 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
 
     const [open, setOpen] = useState(false)
 
-    const onSubmit = async (values: notificationFormData) => {
+    const onSubmit = async (values: NotificationFormData) => {
         try {
-            data?.id ? await updateNotification(data.id, values) : await createNotification(values)
+            if (data?.id) {
+                await updateNotification(data.id, values)
+            } else {
+                await createNotification(values)
+            }
         } catch (e) {
             console.error(e)
             toast(t("Error"), {
@@ -128,10 +138,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                             <DialogDescription />
                         </DialogHeader>
                         <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit as any)}
-                                className="space-y-2 my-2"
-                            >
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 my-2">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -343,6 +350,7 @@ export const NotifierCard: React.FC<NotifierCardProps> = ({ data, mutate }) => {
                                         />
                                     </div>
                                 </div>
+
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">

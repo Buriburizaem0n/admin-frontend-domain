@@ -46,16 +46,17 @@ const natFormSchema = z.object({
     domain: z.string(),
 })
 
-type NatFormData = z.infer<typeof natFormSchema>
+type NatFormInput = z.input<typeof natFormSchema>
+type NatFormData = z.output<typeof natFormSchema>
 
 export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
     const { t } = useTranslation()
-    const form = useForm<NatFormData>({
-        resolver: zodResolver(natFormSchema as any),
+    const form = useForm<NatFormInput, unknown, NatFormData>({
+        resolver: zodResolver(natFormSchema),
         defaultValues: data
             ? {
                   name: data.name ?? "",
-                  enabled: (data as any).enabled ?? false,
+                  enabled: data.enabled ?? false,
                   server_id: data.server_id ?? 0,
                   host: data.host ?? "",
                   domain: data.domain ?? "",
@@ -76,11 +77,16 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
 
     const onSubmit = async (values: NatFormData) => {
         try {
-            data?.id ? await updateNAT(data.id, values) : await createNAT(values)
-        } catch (e) {
+            if (data?.id) {
+                await updateNAT(data.id, values)
+            } else {
+                await createNAT(values)
+            }
+        } catch (e: unknown) {
             console.error(e)
             toast(t("Error"), {
-                description: t("Results.UnExpectedError"),
+                description:
+                    e instanceof Error && e.message ? e.message : t("Results.UnExpectedError"),
             })
             return
         }
@@ -119,15 +125,23 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                 <FormField
                                     control={form.control}
                                     name="server_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("Server")} ID</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" placeholder="1" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    render={({ field }) => {
+                                        const { value, ...fieldProps } = field
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>{t("Server")} ID</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="1"
+                                                        value={String(value ?? "")}
+                                                        {...fieldProps}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
                                 />
                                 <FormField
                                     control={form.control}
@@ -169,7 +183,7 @@ export const NATCard: React.FC<NATCardProps> = ({ data, mutate }) => {
                                             <FormControl>
                                                 <div className="flex items-center gap-2">
                                                     <Checkbox
-                                                        checked={field.value}
+                                                        checked={field.value === true}
                                                         onCheckedChange={field.onChange}
                                                     />
                                                     <Label className="text-sm">{t("Enable")}</Label>

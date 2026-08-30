@@ -8,7 +8,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { GitHubIcon } from "@/components/ui/icon"
+import { OAuthProviderIcon } from "@/components/ui/icon"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/hooks/useAuth"
@@ -39,7 +39,7 @@ function Login() {
         if (oauth2) {
             loginOauth2()
         }
-    }, [window.location.search])
+    }, [loginOauth2])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -56,7 +56,7 @@ function Login() {
     async function loginWith(provider: string) {
         try {
             const redirectUrl = await getOauth2RedirectURL(provider, Oauth2RequestType.LOGIN)
-            window.location.href = redirectUrl.redirect!
+            window.location.assign(redirectUrl.redirect!)
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -120,10 +120,11 @@ function Login() {
             <div className="mt-3 flex flex-col gap-3">
                 {settingData?.config?.oauth2_providers?.map((p: string) => (
                     <Button
+                        key={p}
                         className="w-full rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] bg-muted text-primary hover:bg-muted/80 hover:text-primary/80"
                         onClick={() => loginWith(p)}
                     >
-                        {p === "GitHub" && <GitHubIcon className="size-4" />}
+                        <OAuthProviderIcon provider={p} className="size-4" />
                         {p}
                     </Button>
                 ))}

@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/table"
 import { IconButton } from "@/components/xui/icon-button"
 import { useServer } from "@/hooks/useServer"
+import { selectableTableFeatures } from "@/lib/table"
 import { joinIP } from "@/lib/utils"
 import { ModelServerTaskResponse, ModelServer as Server } from "@/types"
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -43,7 +44,7 @@ export default function ServerPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [error])
 
-    const columns = useMemo<ColumnDef<Server>[]>(
+    const columns = useMemo<ColumnDef<typeof selectableTableFeatures, Server>[]>(
         () => [
             {
                 id: "select",
@@ -64,7 +65,6 @@ export default function ServerPage() {
                         aria-label="Select row"
                     />
                 ),
-                enableSorting: false,
                 enableHiding: false,
             },
             {
@@ -79,6 +79,33 @@ export default function ServerPage() {
                 cell: ({ row }) => {
                     const s = row.original
                     return <div className="max-w-24 whitespace-normal break-words">{s.name}</div>
+                },
+            },
+            {
+                id: "owner",
+                header: t("Owner"),
+                accessorFn: (row) => {
+                    if (!row.owner) return ""
+                    if (row.owner.id === 0) return t("GlobalAgent")
+                    return row.owner.username || t("UnknownUser", { id: row.owner.id })
+                },
+                cell: ({ row }) => {
+                    const owner = row.original.owner
+                    if (!owner) {
+                        return <span className="text-muted-foreground">-</span>
+                    }
+                    if (owner.id === 0) {
+                        return <span>{t("GlobalAgent")}</span>
+                    }
+                    const label = owner.username || t("UnknownUser", { id: owner.id })
+                    return (
+                        <div
+                            className="max-w-32 whitespace-normal break-words"
+                            title={`uid=${owner.id}`}
+                        >
+                            {label}
+                        </div>
+                    )
                 },
             },
             {
@@ -161,10 +188,10 @@ export default function ServerPage() {
         return data ?? []
     }, [data])
 
-    const table = useReactTable({
+    const table = useTable({
+        features: selectableTableFeatures,
         data: dataCache,
         columns,
-        getCoreRowModel: getCoreRowModel(),
     })
 
     const selectedRows = table.getSelectedRowModel().rows

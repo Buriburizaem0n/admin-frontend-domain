@@ -28,7 +28,8 @@ import { asOptionalField } from "@/lib/utils"
 import { ModelServer } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
+
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { KeyedMutator } from "swr"
@@ -55,7 +56,7 @@ const serverFormSchema = z.object({
                 try {
                     JSON.parse(val)
                     return true
-                } catch (e) {
+                } catch {
                     return false
                 }
             },
@@ -88,6 +89,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
             keepDefaultValues: false,
         },
     })
+    const enableDDNS = useWatch({ control: form.control, name: "enable_ddns" })
 
     const [open, setOpen] = useState(false)
 
@@ -189,7 +191,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
-                                {form.watch("enable_ddns") ? (
+                                {enableDDNS ? (
                                     <>
                                         <FormField
                                             control={form.control as any}
@@ -331,6 +333,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({ data, mutate }) => {
                                         </FormItem>
                                     )}
                                 />
+
                                 <DialogFooter className="justify-end">
                                     <DialogClose asChild>
                                         <Button type="button" className="my-2" variant="secondary">

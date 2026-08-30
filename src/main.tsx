@@ -23,9 +23,12 @@ import ServerPage from "./routes/server"
 import ServerGroupPage from "./routes/server-group"
 import ServicePage from "./routes/service"
 import SettingsPage from "./routes/settings"
+import TransferPage from "./routes/transfer"
 import UserPage from "./routes/user"
 import WAFPage from "./routes/waf"
 import DomainPage from "./routes/domain"
+import ApiTokensPage from "./routes/api-tokens"
+
 const router = createBrowserRouter([
     {
         path: "/dashboard",
@@ -143,8 +146,17 @@ const router = createBrowserRouter([
                 path: "/dashboard/domain",
                 element: <DomainPage />,
             },
+            {
+                path: "/dashboard/settings/api-tokens",
+                element: <ApiTokensPage />,
+            },
+            {
+                path: "/dashboard/transfer",
+                element: <TransferPage />,
+            },
         ],
     },
+
 ])
 
 createRoot(document.getElementById("root")!).render(<RouterProvider router={router} />)
