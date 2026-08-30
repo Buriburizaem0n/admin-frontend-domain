@@ -29,12 +29,15 @@
         "typescript/no-unnecessary-type-constraint": "error",
         "typescript/no-unsafe-function-type": "error",
         "react/rules-of-hooks": "error",
-        "react/exhaustive-deps": "warn",
         "typescript/no-explicit-any": "off",
         "react/only-export-components": "off",
-        // React Compiler lint stays opt-in until the compiler is adopted.
-        "react/react-compiler": "off"
+        "react/immutability": "off",
+        "react/set-state-in-effect": "off",
+        "react/incompatible-library": "off",
+        "react/refs": "off"
     },
+
+
     "overrides": [
         {
             "files": [

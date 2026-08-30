@@ -87,13 +87,12 @@ export const BatchEditNoteIcon: React.FC<BatchEditNoteIconProps> = ({
             // For batch, usually we only override if they typed something.
             // We can provide a checkbox or just update if not empty.
             // Let's just update if not empty for safety.
-            let updatePayload = { ...server }
-            if (values.note && values.note.trim() !== "") {
-                updatePayload.note = values.note
+            const updatePayload = {
+                ...server,
+                note: values.note && values.note.trim() !== "" ? values.note : server.note,
+                public_note: values.public_note && values.public_note.trim() !== "" ? values.public_note : server.public_note,
             }
-            if (values.public_note && values.public_note.trim() !== "") {
-                updatePayload.public_note = values.public_note
-            }
+
             
             // Clean up non-API fields
             return updateServer(id, {

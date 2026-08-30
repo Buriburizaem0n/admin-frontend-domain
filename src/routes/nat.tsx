@@ -129,10 +129,10 @@ export default function NATPage() {
 
     return (
         <div className="px-3">
-            <div className="flex mt-6 mb-4">
-                <h1 className="flex-1 text-3xl font-bold tracking-tight"> {t("NATT")}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4 mt-6 mb-4">
+                <h1 className="text-3xl font-bold tracking-tight shrink-0">{t("NATT")}</h1>
                 <HeaderButtonGroup
-                    className="flex ml-auto self-end sm:self-auto gap-2 flex-wrap shrink-0"
+                    className="flex items-center gap-2 flex-wrap shrink-0 sm:ml-auto"
                     delete={{
                         fn: deleteNAT,
                         id: selectedRows.map((r) => r.original.id!),
@@ -142,6 +142,7 @@ export default function NATPage() {
                     <NATCard mutate={mutate} />
                 </HeaderButtonGroup>
             </div>
+
 
             <Table>
                 <TableHeader>

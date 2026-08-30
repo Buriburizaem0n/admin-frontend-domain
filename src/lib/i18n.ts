@@ -62,7 +62,14 @@ const resources = {
 }
 
 const getStoredLanguage = () => {
-    return localStorage.getItem("language") || "en-US"
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            return window.localStorage.getItem("language") || "en-US"
+        }
+    } catch {
+        // ignore
+    }
+    return "en-US"
 }
 
 i18n.use(initReactI18next).init({
@@ -75,7 +82,14 @@ i18n.use(initReactI18next).init({
 })
 
 i18n.on("languageChanged", (lng) => {
-    localStorage.setItem("language", lng)
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            window.localStorage.setItem("language", lng)
+        }
+    } catch {
+        // ignore
+    }
 })
+
 
 export default i18n

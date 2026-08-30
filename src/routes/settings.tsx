@@ -69,8 +69,10 @@ const settingFormSchema = z.object({
     admin_email: asOptionalField(z.string()),
     domain_expiry_notification_days: asOptionalField(z.string()),
     server_expiry_notification_days: asOptionalField(z.string()),
-    expiry_notification_group_id: z.coerce.number().int().min(0),
+    expiry_notification_group_id: asOptionalField(z.coerce.number().int().min(0)),
     enable_mcp: asOptionalField(z.boolean()),
+
+
 
 })
 
